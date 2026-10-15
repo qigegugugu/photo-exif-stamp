@@ -78,6 +78,20 @@ git commit -m "更新 - %date% %time%" >nul 2>nul
 echo   已记录本地改动。
 
 :DOPUSH
+
+echo 正在跟 GitHub 对一下，看有没有别处的新提交...
+git fetch origin main >nul 2>&1
+set "BEHIND="
+for /f "delims=" %%i in ('git rev-list --count HEAD..origin/main 2^>nul') do set "BEHIND=%%i"
+if not defined BEHIND goto PUSHNOW
+if "%BEHIND%"=="0" goto PUSHNOW
+echo.
+echo   远端有 %BEHIND% 个本地没有的提交，先自动合并（以本地版本为准）
+git merge --allow-unrelated-histories --no-edit -X ours origin/main
+if errorlevel 1 goto MERGEFAIL
+echo   合并完成。
+
+:PUSHNOW
 echo.
 echo 正在推送到 GitHub，第一次会弹出登录窗口，登录一次以后就记住。
 echo.
@@ -97,6 +111,15 @@ exit /b 0
 :NOUSER
 echo.
 echo 没有输入内容，已取消。请重新双击运行。
+echo.
+pause
+exit /b 1
+
+
+:MERGEFAIL
+echo.
+echo [失败] 远端有新提交，自动合并没成功。
+echo 这种情况手动处理更稳，把上面几行截图发给老大。
 echo.
 pause
 exit /b 1

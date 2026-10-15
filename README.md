@@ -137,6 +137,33 @@ git commit -m "更新"
 git push
 ```
 
+### 推送被拒绝：`! [rejected] main -> main (fetch first)`
+
+完整报错长这样：
+
+```
+! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/<用户名>/photo-exif-stamp.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally.
+```
+
+**这不是仓库地址写错了。** 真实原因是：远端存在你本地没有的提交。最典型的触发方式是在 GitHub 网页上点过 **`uploading an existing file`** 直接拖文件上传 —— 那会在远端生成一个提交，而本地仓库是独立 `git init` 的，两边**没有共同祖先**，Git 就会拒绝推送。
+
+**现在的 `同步到GitHub.bat` 会自动处理**：推送前先跟远端对一次，发现远端有本地没有的提交就自动合并（冲突时以本地版本为准），然后正常推送。远端那个提交会保留在历史里，不会丢。
+
+脚本万一没搞定，手动兜底：
+
+```bash
+git fetch origin
+git merge --allow-unrelated-histories --no-edit -X ours origin/main
+git push -u origin main
+```
+
+> `-X ours` 表示冲突时以本地版本为准。补救一次之后两边历史就接上了，后续正常同步不会再报这个错。
+>
+> **想彻底避免**：不要在 GitHub 网页上手动上传/编辑文件，统一在本地改，然后双击脚本推送。
+
 ---
 
 ## 国内访问的备选方案
