@@ -504,6 +504,36 @@ details.exif[open] summary::before{transform:rotate(90deg)}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
 }
+
+/* ============================================================
+   滚动跟随 —— 设置面板往下滚时，预览图始终留在视野里
+   · 宽屏（两列）：左列整体吸附在顶栏下方
+   · 窄屏（单列）：必须把 grid 降级成块级，sticky 才能跨过
+     设置面板继续生效（grid item 的 sticky 会被自己那一行截断）
+   --topbar-h 由脚本实测写入，避免顶栏换行/safe-area 变化后错位
+   ============================================================ */
+@media (min-width:960px){
+  .stage{
+    position:sticky;
+    top:calc(var(--topbar-h, 56px) + var(--sp-4));
+    align-self:start;
+  }
+  /* 让「图片 + 工具条 + 缩略图」整体塞得进视口，sticky 才不会半截被裁 */
+  #preview{max-height:calc(100dvh - var(--topbar-h, 56px) - 240px)}
+}
+@media (max-width:959px){
+  .layout{display:block}
+  .stage{
+    position:sticky;
+    top:var(--topbar-h, 56px);
+    z-index:20;
+    background:var(--bg);
+    padding-bottom:var(--sp-2);
+    box-shadow:0 12px 20px -18px rgba(0,0,0,.9);
+  }
+  .panel{margin-top:var(--sp-4)}
+  #preview{max-height:min(34dvh, 300px)}
+}
 </style>
 </head>
 <body>
@@ -2433,34 +2463,134 @@ function download(blob, name){
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
+/* ---------- ZIP 打包（STORE 模式，不压缩） ----------
+   为什么要它：Android 浏览器对「连续多个自动下载」卡得很死 —— 即便点了
+   「允许多个文件下载」，实际也常只落第一个。打包成一个 zip 就只产生
+   一次下载请求，整条限制直接绕开。
+   图已经是 JPEG/PNG，再压缩收益极低，所以走 STORE：zip 体积≈各文件之和，
+   换来极简实现和零依赖（不引 JSZip）。
+   CRC-32 直接复用上面「PNG 块操作」那份，同一种标准算法。 */
+
+/** entries: [{name, blob}] → 一个 zip Blob */
+async function buildZip(entries){
+  const enc = new TextEncoder();
+  const parts = [], central = [];
+  let offset = 0;
+
+  for(const e of entries){
+    const nameBytes = enc.encode(e.name);
+    const ab = await e.blob.arrayBuffer();
+    const crc = crc32(new Uint8Array(ab));
+    const size = e.blob.size;
+
+    const lh = new Uint8Array(30 + nameBytes.length);
+    const lv = new DataView(lh.buffer);
+    lv.setUint32(0, 0x04034b50, true);      // local file header
+    lv.setUint16(4, 20, true);              // version needed
+    lv.setUint16(6, 0x0800, true);          // flags：文件名按 UTF-8（中文名不乱码）
+    lv.setUint16(8, 0, true);               // 0 = STORE
+    lv.setUint16(10, 0, true);              // time
+    lv.setUint16(12, 0x21, true);           // date = 1980-01-01
+    lv.setUint32(14, crc, true);
+    lv.setUint32(18, size, true);           // compressed size
+    lv.setUint32(22, size, true);           // uncompressed size
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true);              // extra length
+    lh.set(nameBytes, 30);
+    parts.push(lh, e.blob);                 // 直接挂原 blob，不再复制一份字节
+
+    const ch = new Uint8Array(46 + nameBytes.length);
+    const cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true);      // central directory header
+    cv.setUint16(4, 20, true);              // version made by
+    cv.setUint16(6, 20, true);              // version needed
+    cv.setUint16(8, 0x0800, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0x21, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, size, true);
+    cv.setUint32(24, size, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);              // extra
+    cv.setUint16(32, 0, true);              // comment
+    cv.setUint16(34, 0, true);              // disk number
+    cv.setUint16(36, 0, true);              // internal attrs
+    cv.setUint32(38, 0, true);              // external attrs
+    cv.setUint32(42, offset, true);         // 本地头偏移
+    ch.set(nameBytes, 46);
+    central.push(ch);
+
+    offset += lh.length + size;
+  }
+
+  const cdSize = central.reduce((s, c) => s + c.length, 0);
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);        // end of central directory
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, entries.length, true);
+  ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, offset, true);           // 中央目录起始偏移
+  ev.setUint16(20, 0, true);                // comment length
+
+  return new Blob([...parts, ...central, eocd], { type: 'application/zip' });
+}
+
+/** zip 内重名会互相覆盖，补 (2)(3) 后缀 */
+function dedupeName(name, seen){
+  if(!seen.has(name)){ seen.add(name); return name; }
+  const dot = name.lastIndexOf('.');
+  const stem = dot > 0 ? name.slice(0, dot) : name;
+  const ext  = dot > 0 ? name.slice(dot) : '';
+  let i = 2, out;
+  do { out = stem + '(' + (i++) + ')' + ext; } while(seen.has(out));
+  seen.add(out);
+  return out;
+}
+
+function zipName(n){
+  const d = new Date(), p = x => String(x).padStart(2, '0');
+  return '光影印章-' + n + '张-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) +
+         '-' + p(d.getHours()) + p(d.getMinutes()) + '.zip';
+}
+
 function cleanErr(e){
   return String((e && e.message) || e).replace(/^CANVAS_(TOO_BIG|OOM):/, "");
 }
 
 /**
- * 导出一张。
+ * 渲染一张（含「顶到画布上限就自动降级重试」），但不下载 —— 下载交给调用方，
+ * 这样「全部导出」才能先把 blob 收齐再决定逐张发还是打包成 zip。
  * 手机浏览器的画布内存有限，原尺寸可能装不下 —— 这时自动降到长边 2560
  * 重试一次，并把"降级了"这件事明确告诉用户，而不是直接报错摆烂。
  */
-async function exportOne(it){
+async function renderOne(it){
   try{
     const r = await renderToBlob(it);
-    download(r.blob, outName(it, r.fmt));
-    return { size: r.blob.size, name: outName(it, r.fmt), degraded: false };
+    return Object.assign({}, r, { degraded: false });
   }catch(err){
     const msg = String(err.message || "");
     const isCapacity = msg.indexOf("CANVAS_TOO_BIG:") === 0 || msg.indexOf("CANVAS_OOM:") === 0;
     const full = targetSize(it);
     if(isCapacity && Math.max(full.w, full.h) > FALLBACK_LONG_EDGE){
       const r = await renderToBlob(it, FALLBACK_LONG_EDGE);
-      download(r.blob, outName(it, r.fmt));
-      return {
-        size: r.blob.size, name: outName(it, r.fmt), degraded: true,
-        from: full.w + "×" + full.h, to: r.w + "×" + r.h
-      };
+      return Object.assign({}, r, {
+        degraded: true,
+        from: full.w + "×" + full.h,
+        to: r.w + "×" + r.h
+      });
     }
     throw err;
   }
+}
+
+async function exportOne(it){
+  const r = await renderOne(it);
+  download(r.blob, outName(it, r.fmt));
+  return { size: r.blob.size, name: outName(it, r.fmt), degraded: !!r.degraded, from: r.from, to: r.to };
 }
 
 let mobileSaveTipShown = false;
@@ -2490,25 +2620,54 @@ async function exportActive(){
 
 async function exportAll(){
   if(!state.items.length || state.busy) return;
-  setBusy(true, "正在导出 " + state.items.length + " 张…");
+  const n = state.items.length;
+
+  /* 手机上多张必须打包：Android 对「连续自动下载」限制很死，
+     即使点了「允许多个文件下载」也常只落第一张。
+     一个 zip 只产生一次下载请求，从根上绕开。桌面保持逐张，方便直接进文件夹。 */
+  const useZip = IS_MOBILE && n > 1;
+
+  setBusy(true, (useZip ? "正在打包 " : "正在导出 ") + n + " 张…");
   let done = 0, totalBytes = 0, failed = 0, degraded = 0;
+  const entries = [], seen = new Set();
+
   for(const it of state.items){
     try{
-      const r = await exportOne(it);
-      totalBytes += r.size; done++;
+      const r = await renderOne(it);
+      totalBytes += r.blob.size; done++;
       if(r.degraded) degraded++;
-      updateProgress(done + "/" + state.items.length);
+      if(useZip){
+        entries.push({ name: dedupeName(outName(it, r.fmt), seen), blob: r.blob });
+      }else{
+        download(r.blob, outName(it, r.fmt));
+      }
+      updateProgress(done + "/" + n);
     }catch(e){
       console.warn("导出失败", it.name, e);
       failed++;
     }
-    await sleep(320); // 避免浏览器拦截连续下载
+    if(!useZip) await sleep(320); // 桌面逐张：拉开间隔，降低被浏览器连击拦截的概率
   }
+
+  let extra = "";
+  if(useZip && entries.length){
+    try{
+      const zip = await buildZip(entries);
+      download(zip, zipName(entries.length));
+      totalBytes = zip.size;
+      extra = "，已打包成 1 个 ZIP（" + fmtSize(zip.size) + "）";
+    }catch(e){
+      console.warn("打包失败，退回逐张下载", e);
+      entries.forEach(en => download(en.blob, en.name));
+      extra = "（打包失败，已改为逐张下载；若只存下第一张，再点一次「全部导出」）";
+    }
+  }
+
   setBusy(false);
-  let msg = "全部导出完成，共 " + done + " 张 / " + fmtSize(totalBytes);
+  let msg = "全部导出完成，共 " + done + " 张 / " + fmtSize(totalBytes) + extra;
   if(degraded) msg += "；其中 " + degraded + " 张因超出画布上限自动缩到长边 " + FALLBACK_LONG_EDGE;
   if(failed) msg += "；" + failed + " 张失败";
-  toast(msg + (failed ? "" : "。若浏览器提示「允许多文件下载」请点允许"), failed ? "" : "ok");
+  toast(msg, failed ? "" : "ok");
   maybeMobileTip();
 }
 
@@ -3239,6 +3398,15 @@ function fmtSize(b){
 }
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
+/* 顶栏实测高度写进 --topbar-h：sticky 预览区的偏移量靠它，
+   写死数值会在顶栏换行 / 刘海屏 safe-area 变化后错位 */
+function syncTopbarHeight(){
+  const tb = document.querySelector('.topbar');
+  if(!tb) return;
+  const h = Math.round(tb.getBoundingClientRect().height);
+  if(h > 0) document.documentElement.style.setProperty('--topbar-h', h + 'px');
+}
+
 /* ============================================================
    7. 初始化
    ============================================================ */
@@ -3602,10 +3770,13 @@ function init(){
   /* --- 窗口尺寸变化时重绘（保持清晰） --- */
   let rz = null;
   window.addEventListener('resize', () => {
+    syncTopbarHeight();               // 顶栏可能因换行变了高度，sticky 偏移要跟着走
     clearTimeout(rz);
     rz = setTimeout(() => { if(current()) renderPreview(); }, 180);
   });
+  window.addEventListener('orientationchange', syncTopbarHeight);
 
+  syncTopbarHeight();
   updateExportEstimate();
 }
 
