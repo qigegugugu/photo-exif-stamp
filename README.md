@@ -1,0 +1,132 @@
+# 光影印章 · 照片 EXIF 水印工具
+
+一个**单文件、零依赖、纯本地**的网页工具：读取照片 EXIF 信息（机身、镜头、拍摄参数），把参数以排版好的方式"盖"在照片上，导出时**不压缩画质、不裁切照片**。
+
+整个工具就是一个 `index.html`（约 160 KB），没有构建步骤、没有后端、没有 CDN 依赖，双击就能用。
+
+---
+
+## 为什么它适合挂在 GitHub Pages
+
+| 条件 | 本工具 |
+|---|---|
+| 纯静态，无服务端 | ✅ 全部逻辑在浏览器里 |
+| 无构建步骤 | ✅ 不用 npm / vite |
+| 无外部依赖 | ✅ 零 CDN、零外链请求 |
+| 入口文件名 | ✅ 就是 `index.html` |
+
+GitHub Pages 要求"仓库根目录有个 `index.html`"，本工具天然满足，上传即上线。
+
+---
+
+## 功能
+
+**支持的图片格式**
+- JPEG / JPG（EXIF 解析最完整）
+- PNG / WebP（读取其中嵌入的 EXIF）
+- **索尼 ARW**（RAW）：解析 TIFF 容器 EXIF，并抽取机身内嵌预览图用于显示
+
+**读取的信息**
+机身厂商、机型、镜头、焦距、光圈、快门、ISO、曝光补偿、测光模式、白平衡、拍摄时间等，可自由勾选要显示哪些。
+
+**内置 10 套版式**
+`bar` 底部条 / `card` 卡片 / `minimal` 极简 / `center` 居中 / `hairline` 细线 / `corner` 角落微标 / `glass` 玻璃拟态 / `polaroid` 白框留白 / `film` 胶片条 / `ticket` 票根
+
+**可调项**
+- 内边距、行间距、距画面边缘距离、整体大小、字号
+- 署名文字 + 左右对齐
+- 自定义 Logo 图片（自动压缩到长边 512px 存入浏览器本地）、三种位置、大小、不透明度
+
+**预设系统**
+版式可命名保存到浏览器本地（localStorage），支持套用、改名、删除，以及导出 / 导入 JSON（用于换设备或分享给别人）。同名保存即覆盖。
+
+**多图处理**
+- 默认**全局同步**：一套版式应用到所有导入的图片
+- 可切换到**每张单独调整**：各图独立样式，缩略图右上角会亮琥珀点标记；一键"把这张的版式应用到全部"可再统一回来
+
+---
+
+## 隐私说明
+
+**照片不会离开你的设备。**
+
+页面的全部处理都在浏览器 canvas 中完成，代码里没有任何 `fetch` / `XMLHttpRequest` / `WebSocket` / `sendBeacon` / 外部资源引用（唯一出现的 `http://` 字面量是 XMP 命名空间标识，不发起请求）。
+
+浏览器本地存储（localStorage）里只保存**你的设置和预设**（含自定义 Logo 的 dataURL），**不保存任何照片**。图片本身无法持久化，关闭页面即消失。
+
+> 注意：这只保证"本工具不上传照片"。托管平台（GitHub Pages / 自己的服务器）在服务层仍会有常规的访问日志（IP、时间、User-Agent），这是所有网站都有的，与本工具无关。想彻底避免，把 `index.html` 下载到本地双击打开即可。
+
+---
+
+## 画质保证
+
+导出时采用 **JPEG 分段手术**方式：
+- 保留原图的 EXIF / IPTC / ICC 色彩配置，只改写像素尺寸标签
+- 宽色域照片（AdobeRGB / ProPhoto）走 `colorSpaceConversion: 'none'` + ICC 透传，**不做 sRGB 转换**，避免颜色被削
+- 画布按"画布变大、照片不裁"的几何逻辑排版（白框类模板会扩画布，照片原样贴入）
+
+实测：照片主体区域与原图对比，PSNR 71.47 dB，最大像素误差 3/255，99.78% 的像素零误差。
+
+---
+
+## 本地使用
+
+下载 `index.html`，双击用浏览器打开即可。推荐 Chrome / Edge / Safari 较新版本。
+
+---
+
+## 部署到 GitHub Pages
+
+### 方式 A：网页上传（不用装任何东西，推荐）
+
+1. 登录 GitHub，右上角 **+ → New repository**
+2. 仓库名填 `photo-exif-stamp`，可见性选 **Public**，点 **Create repository**
+3. 进入新仓库，点 **uploading an existing file**，把 `index.html` 拖进去，点 **Commit changes**
+4. 仓库页 **Settings → Pages**
+5. **Source** 选 `Deploy from a branch`，**Branch** 选 `main`，目录选 `/ (root)`，点 **Save**
+6. 等 1–2 分钟，刷新页面，顶部会出现地址：
+
+   ```
+   https://<你的用户名>.github.io/photo-exif-stamp/
+   ```
+
+### 方式 B：命令行
+
+若仓库已初始化并提交，先关联远端再推送：
+
+```bash
+git remote add origin https://github.com/<你的用户名>/photo-exif-stamp.git
+git branch -M main
+git push -u origin main
+```
+
+推送后按上面第 4 步在 Settings → Pages 里开启即可。
+
+### 自定义域名
+
+在 **Settings → Pages → Custom domain** 填写自己的域名，并在域名服务商处添加 CNAME 记录指向 `<你的用户名>.github.io`。仓库根目录的 `CNAME` 文件由 GitHub 自动生成。
+
+---
+
+## 国内访问的备选方案
+
+GitHub Pages 的 `*.github.io` 域名在中国大陆的访问速度**不稳定**（时快时慢，偶尔需要代理）。如果主要给国内的人用，可以考虑：
+
+- **Gitee Pages**：国内速度快，但需要实名认证，且 Pages 服务需人工审核、每次更新后要手动点"更新"
+- **Cloudflare Pages / Vercel / Netlify**：免费、自动 HTTPS、国内访问通常比 github.io 顺畅，绑定自定义域名后体验更好
+
+这三个平台都是"连仓库 → 自动构建 → 给域名"，本工具因为不需要构建，直接指定根目录即可。
+
+---
+
+## 许可
+
+MIT License，详见 `LICENSE`。
+
+---
+
+## 技术备注
+
+- EXIF 解析器为手写实现，支持小端 / 大端字节序、SubIFD 指针、GPS IFD
+- 索尼机型可读名映射（如 `ILCE-1` → `SONY A1`）
+- 宽色域转换矩阵经 lcms 校验（最大误差 2/255）
