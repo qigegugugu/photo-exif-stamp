@@ -1,0 +1,3615 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="读取照片 EXIF，在图片上叠加相机、镜头与拍摄参数水印，可自选字段并原尺寸导出。纯本地处理，不上传服务器。">
+<meta name="theme-color" content="#0b1017" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+<!-- 手机浏览器 / 添加到主屏幕 -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="光影印章">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<title>光影印章 · 照片 EXIF 水印工具</title>
+<style>
+/* ============================================================
+   设计 Token —— 8px 基线 / Amber 主色阶 / Slate 中性阶
+   ============================================================ */
+:root{
+  --amber-50:#fffbeb; --amber-100:#fef3c7; --amber-200:#fde68a; --amber-300:#fcd34d;
+  --amber-400:#fbbf24; --amber-500:#f59e0b; --amber-600:#d97706; --amber-700:#b45309;
+  --amber-800:#92400e; --amber-900:#78350f;
+  --emerald-500:#10b981; --emerald-600:#059669;
+  --rose-500:#f43f5e; --rose-600:#e11d48;
+
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-full:999px;
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px;
+  --t-fast:200ms; --t-base:250ms;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --shadow-1:0 1px 2px rgba(0,0,0,.24);
+  --shadow-2:0 8px 24px -6px rgba(0,0,0,.4);
+}
+html[data-theme="dark"]{
+  --bg:#0b1017; --bg-deep:#070b10;
+  --surface:#141c26; --surface-2:#1c2733; --surface-3:#243140;
+  --border:#2a3846; --border-strong:#3a4b5c;
+  --text:#e9eff6; --text-dim:#93a3b4; --text-faint:#6b7b8c;
+  --accent:#fbbf24; --accent-ink:#20160a; --accent-soft:rgba(251,191,36,.14);
+  --ok:#34d399; --err:#fb7185;
+}
+html[data-theme="light"]{
+  --bg:#f4f6f9; --bg-deep:#e9edf2;
+  --surface:#ffffff; --surface-2:#f5f7fa; --surface-3:#eaeff5;
+  --border:#dce3ea; --border-strong:#c3cedb;
+  --text:#0f1922; --text-dim:#586a7c; --text-faint:#7d8d9e;
+  --accent:#b45309; --accent-ink:#fffaf0; --accent-soft:rgba(180,83,9,.10);
+  --ok:#059669; --err:#e11d48;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{
+  -webkit-text-size-adjust:100%;   /* 横屏时不要自动放大字号 */
+  text-size-adjust:100%;
+}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"Inter","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  font-size:14px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  overflow-x:hidden;                /* 手机上杜绝横向晃动 */
+  overscroll-behavior-y:none;
+  transition:background var(--t-base) var(--ease), color var(--t-base) var(--ease);
+}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+/* hidden 属性必须能压过 .btn 的 display —— 否则带 hidden 的按钮照样显示 */
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; gap:var(--sp-3);
+  padding:var(--sp-3) var(--sp-4);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter:saturate(140%) blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex;align-items:center;gap:var(--sp-3);min-width:0}
+.brand-mark{
+  width:32px;height:32px;flex:none;border-radius:10px;
+  background:linear-gradient(140deg,var(--amber-400),var(--amber-600));
+  display:grid;place-items:center;color:#2a1c05;font-weight:800;font-size:16px;
+  box-shadow:0 4px 14px -4px rgba(245,158,11,.6);
+}
+.brand-text h1{font-size:15px;font-weight:700;letter-spacing:.2px;line-height:1.2}
+.brand-text p{font-size:11px;color:var(--text-faint);line-height:1.3}
+.topbar-actions{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center}
+.icon-btn{
+  width:36px;height:36px;border-radius:var(--r-sm);
+  border:1px solid var(--border); background:var(--surface-2);
+  display:grid;place-items:center;cursor:pointer;
+  transition:transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.icon-btn:hover{transform:scale(1.05); background:var(--surface-3); border-color:var(--border-strong)}
+.icon-btn:active{transform:scale(.95)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- 布局：移动优先单列 ---------- */
+.layout{
+  display:grid; gap:var(--sp-4);
+  padding:var(--sp-4);
+  max-width:1680px; margin:0 auto;
+  align-items:start;
+}
+@media (min-width:960px){
+  .layout{grid-template-columns:minmax(0,1fr) 372px; gap:var(--sp-5); padding:var(--sp-5)}
+}
+@media (min-width:1400px){
+  .layout{grid-template-columns:minmax(0,1fr) 400px}
+}
+
+/* ---------- 预览台 ---------- */
+.stage{min-width:0;display:flex;flex-direction:column;gap:var(--sp-3)}
+.dropzone{
+  position:relative; display:grid; place-items:center; text-align:center;
+  min-height:320px; padding:var(--sp-6) var(--sp-4);
+  border:2px dashed var(--border-strong); border-radius:var(--r-lg);
+  background:
+    radial-gradient(120% 100% at 50% 0%, var(--accent-soft), transparent 62%),
+    var(--surface);
+  cursor:pointer;
+  transition:border-color var(--t-base) var(--ease), background var(--t-base) var(--ease), transform var(--t-base) var(--ease);
+}
+.dropzone:hover{border-color:var(--accent)}
+.dropzone.is-drag{border-color:var(--accent); transform:scale(1.005); background:var(--surface-2)}
+.dropzone-inner{display:flex;flex-direction:column;align-items:center;gap:var(--sp-3);pointer-events:none}
+.dropzone-icon{
+  width:56px;height:56px;border-radius:var(--r-lg);
+  background:var(--accent-soft); color:var(--accent);
+  display:grid;place-items:center;
+}
+.dropzone-icon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dropzone h2{font-size:16px;font-weight:650}
+.dropzone p{font-size:12.5px;color:var(--text-dim);max-width:34ch}
+.dropzone .btn{margin-top:var(--sp-2);pointer-events:auto}
+.file-hint{font-size:11px;color:var(--text-faint);margin-top:var(--sp-1)}
+
+.canvas-wrap{
+  position:relative; border-radius:var(--r-lg); overflow:hidden;
+  background:
+    linear-gradient(45deg,#1a2230 25%,transparent 25%,transparent 75%,#1a2230 75%),
+    linear-gradient(45deg,#1a2230 25%,#131b25 25%,#131b25 75%,#1a2230 75%);
+  background-size:20px 20px; background-position:0 0,10px 10px;
+  border:1px solid var(--border);
+  display:grid; place-items:center;
+  min-height:200px;
+  box-shadow:var(--shadow-2);
+}
+html[data-theme="light"] .canvas-wrap{
+  background:
+    linear-gradient(45deg,#e4e9ef 25%,transparent 25%,transparent 75%,#e4e9ef 75%),
+    linear-gradient(45deg,#e4e9ef 25%,#f3f6f9 25%,#f3f6f9 75%,#e4e9ef 75%);
+  background-size:20px 20px; background-position:0 0,10px 10px;
+}
+#preview{display:block;max-width:100%;height:auto;max-height:64vh}
+@media (min-width:960px){ #preview{max-height:74vh} }
+
+/* ---------- 缩略图条 ---------- */
+.thumbs{
+  display:flex; gap:var(--sp-2); overflow-x:auto; padding:var(--sp-1) 2px var(--sp-2);
+  scrollbar-width:thin;
+}
+.thumbs:empty{display:none}
+.thumb{
+  position:relative; flex:none; width:60px; height:60px; border-radius:var(--r-sm);
+  overflow:hidden; border:2px solid var(--border); background:var(--surface-2);
+  cursor:pointer; padding:0;
+  transition:transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb:hover{transform:scale(1.05)}
+.thumb:active{transform:scale(.95)}
+.thumb[aria-current="true"]{border-color:var(--accent)}
+.thumb .badge{
+  position:absolute; inset:auto 0 0 0; font-size:9px; text-align:center;
+  background:rgba(0,0,0,.62); color:#fff; padding:1px 0; letter-spacing:.2px;
+}
+.thumb .unread{
+  position:absolute; top:3px; right:3px; width:8px;height:8px;border-radius:50%;
+  background:var(--rose-500); box-shadow:0 0 0 2px var(--bg);
+}
+
+/* ---------- 预览工具条 ---------- */
+.stage-tools{
+  display:flex; flex-wrap:wrap; gap:var(--sp-2); align-items:center;
+}
+.stage-meta{font-size:11.5px;color:var(--text-faint);margin-left:auto;text-align:right;min-width:0}
+.stage-meta b{color:var(--text-dim);font-weight:600}
+
+/* ---------- 按钮 ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 14px; border-radius:var(--r-sm); border:1px solid var(--border);
+  background:var(--surface-2); color:var(--text); cursor:pointer;
+  font-size:13px; font-weight:550; white-space:nowrap;
+  transition:transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+             border-color var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease);
+}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn:hover{transform:scale(1.05); background:var(--surface-3); border-color:var(--border-strong)}
+.btn:active{transform:scale(.95)}
+.btn[disabled]{opacity:.42;cursor:not-allowed;transform:none}
+.btn-primary{
+  background:linear-gradient(140deg,var(--amber-400),var(--amber-600));
+  border-color:transparent; color:#241903;
+}
+.btn-primary:hover{background:linear-gradient(140deg,var(--amber-300),var(--amber-500))}
+.btn-primary svg{stroke:#241903}
+.btn-sm{padding:6px 10px;font-size:12px}
+.btn-block{width:100%}
+
+/* ---------- 面板 ---------- */
+.panel{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+  overflow:hidden; box-shadow:var(--shadow-1);
+}
+.tabs{display:flex; border-bottom:1px solid var(--border); background:var(--surface-2)}
+.tab{
+  flex:1; padding:11px 8px; background:none; border:none; cursor:pointer;
+  font-size:12.5px; font-weight:550; color:var(--text-dim); position:relative;
+  transition:color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.tab:hover{color:var(--text); background:var(--surface-3)}
+.tab[aria-selected="true"]{color:var(--accent)}
+.tab[aria-selected="true"]::after{
+  content:""; position:absolute; left:12%; right:12%; bottom:-1px; height:2px;
+  background:var(--accent); border-radius:2px 2px 0 0;
+}
+.tabpanel{padding:var(--sp-4); display:flex; flex-direction:column; gap:var(--sp-5)}
+.tabpanel[hidden]{display:none}
+
+.group{display:flex;flex-direction:column;gap:var(--sp-3)}
+.group-title{
+  font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--text-faint); display:flex; align-items:center; gap:var(--sp-2);
+}
+.group-title::after{content:"";flex:1;height:1px;background:var(--border)}
+
+/* ---------- 字段复选 ---------- */
+.field-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:6px}
+.check{
+  display:flex; align-items:center; gap:8px; padding:7px 9px;
+  border:1px solid var(--border); border-radius:var(--r-sm); background:var(--surface-2);
+  cursor:pointer; font-size:12.5px;
+  transition:transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease);
+}
+.check:hover{transform:scale(1.02); border-color:var(--border-strong)}
+.check:active{transform:scale(.98)}
+.check input{
+  appearance:none; width:16px;height:16px;flex:none; border-radius:4px;
+  border:1.5px solid var(--border-strong); background:var(--surface);
+  display:grid;place-items:center; cursor:pointer; transition:all var(--t-fast) var(--ease);
+}
+.check input:checked{background:var(--accent); border-color:var(--accent)}
+.check input:checked::after{
+  content:""; width:8px;height:4px; border-left:2px solid var(--accent-ink);
+  border-bottom:2px solid var(--accent-ink); transform:rotate(-45deg) translateY(-1px);
+}
+.check:has(input:checked){border-color:var(--accent); background:var(--accent-soft)}
+.check.is-empty{opacity:.45}
+.check.is-empty:hover{opacity:.7}
+
+/* ---------- 模板选择 ---------- */
+.tpl-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(84px,1fr)); gap:8px}
+.tpl{
+  border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface-2);
+  padding:8px; cursor:pointer; display:flex; flex-direction:column; gap:6px; align-items:stretch;
+  transition:transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.tpl:hover{transform:scale(1.03); border-color:var(--border-strong)}
+.tpl:active{transform:scale(.97)}
+.tpl[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+.tpl-preview{
+  height:38px; border-radius:6px; background:#141b24; position:relative; overflow:hidden;
+  border:1px solid rgba(255,255,255,.07);
+}
+.tpl-preview i{position:absolute;display:block;background:#e9eff6;border-radius:1px;opacity:.85}
+.tpl-name{font-size:11.5px;text-align:center;font-weight:550;color:var(--text-dim)}
+.tpl[aria-pressed="true"] .tpl-name{color:var(--accent)}
+
+/* ---------- Logo 选择 ---------- */
+.logo-row{display:flex;gap:var(--sp-3);align-items:center}
+.logo-slot{
+  width:70px;height:48px;flex:none;border-radius:var(--r-sm);border:1px dashed var(--border);
+  background:var(--surface-2); display:flex; align-items:center; justify-content:center;
+  overflow:hidden; padding:3px; font-size:10.5px; color:var(--text-faint);
+}
+.logo-slot img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.logo-ctl{display:flex;gap:6px;flex-wrap:wrap}
+.btn-danger{color:#ff8b8b;border-color:rgba(255,139,139,.35)}
+.btn-danger:hover{background:rgba(255,139,139,.12)}
+.btn[disabled]{opacity:.42;cursor:not-allowed}
+
+/* ---------- 预设列表 ---------- */
+.preset-list{display:flex;flex-direction:column;gap:5px}
+.preset-row{
+  display:flex;align-items:center;gap:5px;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:5px 6px 5px 10px;
+}
+.preset-name{
+  flex:1;min-width:0;font-size:12.5px;cursor:pointer;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.preset-name:hover{color:var(--accent)}
+.empty-hint{
+  font-size:11.5px;line-height:1.5;color:var(--text-faint);background:var(--surface-2);
+  border:1px dashed var(--border);border-radius:var(--r-sm);padding:9px 11px;
+}
+@media (hover:hover) and (pointer:fine){
+  .preset-row .btn{padding:4px 7px;font-size:11px}
+}
+
+/* 单独调整过版式的照片，缩略图右上角起点 */
+.thumb.is-custom::after{
+  content:'';position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 2px rgba(0,0,0,.5);
+}
+
+/* ---------- 表单控件 ---------- */
+.row{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.row label,.lbl{font-size:12.5px;color:var(--text-dim)}
+.field{display:flex;flex-direction:column;gap:6px}
+input[type=range]{
+  appearance:none; width:100%; height:22px; background:transparent; cursor:pointer;
+}
+input[type=range]::-webkit-slider-runnable-track{
+  height:4px;border-radius:2px;background:var(--surface-3);border:1px solid var(--border);
+}
+input[type=range]::-webkit-slider-thumb{
+  appearance:none; width:16px;height:16px;border-radius:50%;margin-top:-7px;
+  background:var(--accent); border:2px solid var(--surface);
+  box-shadow:0 1px 4px rgba(0,0,0,.4); transition:transform var(--t-fast) var(--ease);
+}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--surface-3)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.val{
+  font-size:11.5px; font-variant-numeric:tabular-nums; color:var(--text-faint);
+  background:var(--surface-2); padding:1px 7px; border-radius:var(--r-full); border:1px solid var(--border);
+}
+input[type=text],input[type=number],select{
+  width:100%; padding:8px 10px; border-radius:var(--r-sm);
+  border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+  font-size:13px; transition:border-color var(--t-fast) var(--ease);
+}
+input[type=text]:hover,select:hover{border-color:var(--border-strong)}
+input[type=color]{
+  width:100%;height:34px;padding:2px;border-radius:var(--r-sm);
+  border:1px solid var(--border);background:var(--surface-2);cursor:pointer;
+}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;background:var(--surface-2)}
+.seg button{
+  flex:1 1 auto;min-width:62px;white-space:nowrap;padding:7px 4px;border:none;background:none;cursor:pointer;font-size:12px;
+  color:var(--text-dim);transition:all var(--t-fast) var(--ease);
+}
+.seg button:hover{background:var(--surface-3);color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.anchor-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+  width:132px; margin:0 auto;
+}
+.anchor-grid button{
+  aspect-ratio:1;border-radius:6px;border:1px solid var(--border);
+  background:var(--surface-2);cursor:pointer;display:grid;place-items:center;
+  transition:all var(--t-fast) var(--ease);
+}
+.anchor-grid button:hover{transform:scale(1.06);border-color:var(--border-strong)}
+.anchor-grid button:active{transform:scale(.94)}
+.anchor-grid button i{width:6px;height:6px;border-radius:50%;background:var(--text-faint);display:block}
+.anchor-grid button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.anchor-grid button[aria-pressed="true"] i{background:var(--accent)}
+
+.note{
+  font-size:11.5px;line-height:1.55;color:var(--text-faint);
+  background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-sm);
+  padding:9px 11px;
+}
+.note b{color:var(--text-dim)}
+
+/* ---------- EXIF 明细 ---------- */
+details.exif{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+  overflow:hidden;
+}
+details.exif summary{
+  padding:12px var(--sp-4); cursor:pointer; font-size:13px; font-weight:600;
+  list-style:none; display:flex; align-items:center; gap:var(--sp-2);
+  transition:background var(--t-fast) var(--ease);
+}
+details.exif summary:hover{background:var(--surface-2)}
+details.exif summary::-webkit-details-marker{display:none}
+details.exif summary::before{
+  content:"▸"; color:var(--accent); transition:transform var(--t-base) var(--ease); display:inline-block;
+}
+details.exif[open] summary::before{transform:rotate(90deg)}
+.exif-table{
+  width:100%; border-collapse:collapse; font-size:12px;
+}
+.exif-table th,.exif-table td{
+  text-align:left; padding:7px var(--sp-4); border-top:1px solid var(--border);
+  vertical-align:top;
+}
+.exif-table th{color:var(--text-faint);font-weight:500;width:38%;}
+.exif-table td{color:var(--text);font-variant-numeric:tabular-nums;word-break:break-word}
+.exif-empty{padding:var(--sp-4);font-size:12.5px;color:var(--text-faint)}
+
+/* ---------- Toast ---------- */
+.toast-host{
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+  z-index:100; display:flex; flex-direction:column; gap:8px; align-items:center;
+  pointer-events:none; width:calc(100% - 32px); max-width:420px;
+}
+.toast{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 14px; border-radius:var(--r-full);
+  background:var(--surface-3); border:1px solid var(--border-strong); color:var(--text);
+  font-size:12.5px; box-shadow:var(--shadow-2);
+  animation:toast-in var(--t-base) var(--ease);
+  max-width:100%;
+}
+.toast.ok{border-color:color-mix(in srgb,var(--ok) 50%,var(--border))}
+.toast.err{border-color:color-mix(in srgb,var(--err) 55%,var(--border))}
+.toast .dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--accent)}
+.toast.ok .dot{background:var(--ok)}
+.toast.err .dot{background:var(--err)}
+@keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+
+.spin{
+  width:13px;height:13px;border-radius:50%;
+  border:2px solid color-mix(in srgb,currentColor 30%,transparent);
+  border-top-color:currentColor; animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+/* ============================================================
+   触屏设备适配（手机 / 平板）
+   - 触控目标一律 ≥44px（iOS HIG 与 WCAG 2.2 目标尺寸）
+   - 输入框字号 ≥16px，避免 iOS Safari 聚焦时自动放大页面
+   - 滑块拉大，戴手套也能拖
+   ============================================================ */
+.btn, .icon-btn, .tab, .tpl, .thumb, .check, .anchor-grid button, .seg button{
+  touch-action:manipulation;   /* 去掉双击缩放带来的 300ms 延迟 */
+  -webkit-tap-highlight-color:transparent;
+}
+@media (pointer:coarse){
+  .icon-btn{width:46px;height:46px}
+  .icon-btn svg{width:20px;height:20px}
+  .btn{padding:12px 16px;min-height:46px;font-size:14.5px}
+  .btn-sm{padding:11px 14px;min-height:44px}
+  .btn svg{width:17px;height:17px}
+  .tab{padding:15px 8px;font-size:14px}
+  .check{padding:12px 12px;gap:10px;min-height:46px;font-size:13.5px}
+  .check input{width:20px;height:20px;border-radius:5px}
+  .check input:checked::after{width:10px;height:5px}
+  .thumb{width:76px;height:76px}
+  .thumb .badge{font-size:10px;padding:2px 0}
+  .tpl{padding:10px}
+  .tpl-preview{height:46px}
+  .tpl-name{font-size:12.5px}
+  .anchor-grid{width:174px}
+  .anchor-grid button i{width:8px;height:8px}
+  input[type=range]{height:46px}
+  input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px}
+  input[type=range]::-webkit-slider-thumb{width:28px;height:28px;margin-top:-12px;border-width:3px}
+  input[type=range]::-moz-range-track{height:6px;border-radius:3px}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border-width:3px}
+  input[type=text],input[type=number],select{padding:12px;font-size:16px}  /* 16px：防 iOS 自动缩放 */
+  .seg button{padding:12px 6px;font-size:13.5px}
+  .dropzone{min-height:300px;padding:var(--sp-5) var(--sp-4)}
+  .dropzone h2{font-size:17px}
+  .dropzone p{font-size:13.5px}
+  details.exif summary{padding:15px var(--sp-4)}
+  .toast{font-size:13.5px;padding:12px 16px}
+  .stage-meta{font-size:12px}
+  input[type=color]{height:44px}
+}
+/* 刘海屏 / 灵动岛安全区（添加到主屏幕后全屏运行时生效） */
+@supports (padding:env(safe-area-inset-top)){
+  .topbar{
+    padding-top:calc(var(--sp-3) + env(safe-area-inset-top, 0px));
+    padding-left:calc(var(--sp-4) + env(safe-area-inset-left, 0px));
+    padding-right:calc(var(--sp-4) + env(safe-area-inset-right, 0px));
+  }
+  .layout{
+    padding-bottom:calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+    padding-left:calc(var(--sp-4) + env(safe-area-inset-left, 0px));
+    padding-right:calc(var(--sp-4) + env(safe-area-inset-right, 0px));
+  }
+  .toast-host{bottom:calc(24px + env(safe-area-inset-bottom, 0px))}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">影</div>
+    <div class="brand-text">
+      <h1>光影印章</h1>
+      <p>读取 EXIF · 叠加参数 · 原尺寸导出</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="icon-btn" id="btnTheme" type="button" aria-label="切换深浅色主题" title="切换深浅色主题">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button class="icon-btn" id="btnHelp" type="button" aria-label="使用说明" title="使用说明">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.7-.9 1.3v.6"/><path d="M12 17h.01"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ================= 左侧：预览台 ================= -->
+  <section class="stage" aria-label="预览区">
+
+    <div class="thumbs" id="thumbs" role="tablist" aria-label="已载入照片"></div>
+
+    <div id="dropzoneHost">
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/*" multiple class="sr-only">
+        <div class="dropzone-inner">
+          <div class="dropzone-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M12 4L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          </div>
+          <h2>把照片拖进来，或点击选择</h2>
+          <p>支持一次多张。原生读取 JPEG / PNG / WebP 内的 EXIF，照片只在你本机处理，不会上传到任何服务器。</p>
+          <span class="btn btn-primary" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            选择照片
+          </span>
+          <span class="file-hint">或按 Ctrl+V 粘贴剪贴板里的图片 / 截图</span>
+        </div>
+      </label>
+    </div>
+
+    <div id="canvasHost" hidden>
+      <div class="canvas-wrap">
+        <canvas id="preview" role="img" aria-label="带水印的照片预览"></canvas>
+      </div>
+    </div>
+
+    <div class="stage-tools" id="stageTools" hidden>
+      <button class="btn btn-sm" id="btnPrev" type="button" aria-label="上一张">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>上一张
+      </button>
+      <button class="btn btn-sm" id="btnNext" type="button" aria-label="下一张">
+        下一张<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn btn-sm" id="btnExportOne" type="button">
+        <svg viewBox="0 0 24 24"><path d="M12 4v11M12 15l-4-4M12 15l4-4"/><path d="M5 19h14"/></svg>
+        导出这张
+      </button>
+      <button class="btn btn-sm btn-primary" id="btnExportAll" type="button">
+        <svg viewBox="0 0 24 24"><path d="M12 4v11M12 15l-4-4M12 15l4-4"/><path d="M4 19h10"/></svg>
+        全部导出
+      </button>
+      <button class="btn btn-sm" id="btnClear" type="button" title="清空已载入照片">清空</button>
+      <div class="stage-meta" id="stageMeta"></div>
+    </div>
+
+    <details class="exif" id="exifBox" hidden>
+      <summary>原始 EXIF 明细</summary>
+      <div id="exifBody"></div>
+    </details>
+  </section>
+
+  <!-- ================= 右侧：设置面板 ================= -->
+  <aside class="panel" aria-label="水印设置">
+    <div class="tabs" role="tablist" aria-label="设置分类">
+      <button class="tab" role="tab" id="tab-content" aria-controls="panel-content" aria-selected="true" type="button">显示内容</button>
+      <button class="tab" role="tab" id="tab-style" aria-controls="panel-style" aria-selected="false" type="button" tabindex="-1">版式样式</button>
+      <button class="tab" role="tab" id="tab-export" aria-controls="panel-export" aria-selected="false" type="button" tabindex="-1">导出设置</button>
+    </div>
+
+    <!-- ---------- 显示内容 ---------- -->
+    <div class="tabpanel" id="panel-content" role="tabpanel" aria-labelledby="tab-content">
+      <div class="group">
+        <div class="group-title">自动识别到的信息</div>
+        <div class="note" id="detectNote">还没有载入照片。载入后这里会列出识别到的厂商 / 镜头 / 参数。</div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">勾选要显示的内容</div>
+        <div id="fieldGroups"></div>
+        <label class="check" style="padding:10px 11px;margin-top:6px" id="readableModelWrap">
+          <input type="checkbox" id="readableModel" checked>
+          <span>机型用通用名字（A1 而不是 ILCE-1）</span>
+        </label>
+        <div class="note">
+          索尼把机型写成 <b>ILCE-1</b> / <b>ILCE-7RM3</b> / <b>ILCE-7CM2</b>。
+          勾上之后水印里显示的是 <b>A1</b> / <b>A7R III</b> / <b>A7C II</b>，
+          照片本身写什么不受影响。
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">自定义文字</div>
+        <div class="field">
+          <label class="lbl" for="customText">署名 / 备注（留空则不显示）</label>
+          <input type="text" id="customText" placeholder="例：Photographed by 老大" maxlength="60">
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- 版式样式 ---------- -->
+    <div class="tabpanel" id="panel-style" role="tabpanel" aria-labelledby="tab-style" hidden>
+      <div class="group">
+        <div class="group-title">多图版式</div>
+        <div class="seg" id="multiSeg" role="group" aria-label="多图版式模式">
+          <button type="button" data-mode="global" aria-pressed="true">所有照片同步</button>
+          <button type="button" data-mode="per" aria-pressed="false">每张单独调整</button>
+        </div>
+        <div class="note" id="multiNote">
+          默认<b>全局同步</b>：改一次，所有照片一起变。横竖混排想分别微调，再切「每张单独调整」。
+        </div>
+        <button class="btn btn-block btn-sm" id="btnApplyAll" type="button" hidden>把当前版式应用到全部照片</button>
+      </div>
+
+      <div class="group">
+        <div class="group-title">版式模板</div>
+        <div class="tpl-grid" id="tplGrid"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">水印位置</div>
+        <div class="anchor-grid" id="anchorGrid" role="group" aria-label="水印锚点位置"></div>
+        <div class="field" style="margin-top:var(--sp-2)">
+          <div class="row"><label for="offX">水平微调</label><span class="val" id="offXVal">0%</span></div>
+          <input type="range" id="offX" min="-40" max="40" value="0" step="1">
+        </div>
+        <div class="field">
+          <div class="row"><label for="offY">垂直微调</label><span class="val" id="offYVal">0%</span></div>
+          <input type="range" id="offY" min="-40" max="40" value="0" step="1">
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">尺寸与留白</div>
+        <div class="field">
+          <div class="row"><label for="sizeScale">整体大小</label><span class="val" id="sizeScaleVal">2.2%</span></div>
+          <input type="range" id="sizeScale" min="0.8" max="7" value="2.2" step="0.1">
+          <div class="note" style="margin-top:0">文字与留白一起缩放。想要「小微标」就往左拉。</div>
+        </div>
+        <div class="field">
+          <div class="row"><label for="padScale">内边距（留白）</label><span class="val" id="padScaleVal">1.00×</span></div>
+          <input type="range" id="padScale" min="0.4" max="2.4" value="1" step="0.05">
+        </div>
+        <div class="field">
+          <div class="row"><label for="lineGap">行间距</label><span class="val" id="lineGapVal">1.34×</span></div>
+          <input type="range" id="lineGap" min="1" max="2.2" value="1.34" step="0.02">
+        </div>
+        <div class="field">
+          <div class="row"><label for="marginMul">距画面边缘</label><span class="val" id="marginMulVal">1.00×</span></div>
+          <input type="range" id="marginMul" min="0.2" max="3" value="1" step="0.05">
+          <div class="note" style="margin-top:0">通栏模板铺满，此项不生效。</div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">视觉</div>
+        <div class="field">
+          <div class="row"><label for="bgOpacity">底衬不透明度</label><span class="val" id="bgOpacityVal">55%</span></div>
+          <input type="range" id="bgOpacity" min="0" max="100" value="55" step="1">
+        </div>
+        <div class="field">
+          <div class="row"><label for="sepSel">参数分隔符</label></div>
+          <select id="sepSel">
+            <option value="2">中圆点　·　·</option>
+            <option value="1">竖线　|　</option>
+            <option value="0">空格</option>
+            <option value="3">斜杠　/</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field" style="flex:1">
+            <label class="lbl" for="textColor">文字颜色</label>
+            <input type="color" id="textColor" value="#ffffff">
+          </div>
+          <div class="field" style="flex:1">
+            <label class="lbl" for="bgColor">底衬颜色</label>
+            <input type="color" id="bgColor" value="#000000">
+          </div>
+          <div class="field" style="flex:1">
+            <label class="lbl" for="accentColor">强调色</label>
+            <input type="color" id="accentColor" value="#fbbf24">
+          </div>
+        </div>
+        <div class="field">
+          <div class="row"><label for="radius">圆角</label><span class="val" id="radiusVal">14px</span></div>
+          <input type="range" id="radius" min="0" max="40" value="14" step="1">
+        </div>
+        <div class="row">
+          <label class="lbl" for="boldTitle">标题加粗</label>
+          <div class="seg" style="width:132px">
+            <button type="button" id="boldTitle" role="switch" aria-checked="true" data-on="1">开</button>
+            <button type="button" id="boldTitleOff" aria-hidden="true" tabindex="-1" disabled>关</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">署名</div>
+        <div class="field">
+          <label class="lbl" for="sigText">署名文字（留空则不显示）</label>
+          <input type="text" id="sigText" placeholder="例：© 老大 · 2026" maxlength="60">
+        </div>
+        <div class="row">
+          <label class="lbl">署名对齐</label>
+          <div class="seg" id="sigAlignSeg" style="width:150px">
+            <button type="button" data-al="left" aria-pressed="false">左</button>
+            <button type="button" data-al="right" aria-pressed="true">右</button>
+          </div>
+        </div>
+        <div class="note">署名会单独占一行，用强调色斜体显示。想用手写签名图，见下面的 Logo。</div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Logo / 签名图</div>
+        <div class="logo-row">
+          <div class="logo-slot" id="logoSlot"><span>未选择</span></div>
+          <div class="logo-ctl">
+            <button class="btn btn-sm" id="btnLogoPick" type="button">选择图片</button>
+            <button class="btn btn-sm" id="btnLogoClear" type="button">清除</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="lbl">位置</label>
+          <div class="seg" id="logoPosSeg" style="width:190px">
+            <button type="button" data-pos="left" aria-pressed="true">左</button>
+            <button type="button" data-pos="top" aria-pressed="false">上</button>
+            <button type="button" data-pos="right" aria-pressed="false">右</button>
+          </div>
+        </div>
+        <div class="field">
+          <div class="row"><label for="logoScale">大小</label><span class="val" id="logoScaleVal">1.15×</span></div>
+          <input type="range" id="logoScale" min="0.4" max="4" value="1.15" step="0.05">
+        </div>
+        <div class="field">
+          <div class="row"><label for="logoOpacity">不透明度</label><span class="val" id="logoOpacityVal">100%</span></div>
+          <input type="range" id="logoOpacity" min="10" max="100" value="100" step="1">
+        </div>
+        <div class="note">
+          支持 PNG（透明底更好）/ JPG / SVG 转 PNG。图片会自动缩到长边 512px 存在本机浏览器里，<b>不会上传</b>。<br>
+          只有当前这张单独调整时才各自不同，全局模式下所有照片共用同一个 Logo。
+        </div>
+        <input type="file" id="logoInput" accept="image/*" style="display:none">
+      </div>
+
+      <div class="group">
+        <div class="group-title">我的预设</div>
+        <div class="row" style="gap:6px">
+          <input type="text" id="presetName" placeholder="预设名字，例：夜景通栏" maxlength="24" style="flex:1">
+          <button class="btn btn-sm" id="btnPresetSave" type="button">保存</button>
+        </div>
+        <div class="preset-list" id="presetList"></div>
+        <div class="row" style="gap:6px;margin-top:6px">
+          <button class="btn btn-sm" id="btnPresetExport" type="button" style="flex:1">导出预设文件</button>
+          <button class="btn btn-sm" id="btnPresetImport" type="button" style="flex:1">导入预设文件</button>
+        </div>
+        <input type="file" id="presetFile" accept=".json,application/json" style="display:none">
+        <div class="note">预设会保存版式、颜色、字段勾选和导出设置，下次一件套用。存在本机浏览器，不上传。</div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">快捷操作</div>
+        <button class="btn btn-block btn-sm" id="btnReset" type="button">恢复默认样式</button>
+      </div>
+    </div>
+
+    <!-- ---------- 导出设置 ---------- -->
+    <div class="tabpanel" id="panel-export" role="tabpanel" aria-labelledby="tab-export" hidden>
+      <div class="group">
+        <div class="group-title">输出格式</div>
+        <div class="seg" id="formatSeg" role="group" aria-label="输出格式">
+          <button type="button" data-fmt="source" aria-pressed="true">跟随原图</button>
+          <button type="button" data-fmt="jpeg" aria-pressed="false">JPEG</button>
+          <button type="button" data-fmt="png" aria-pressed="false">PNG</button>
+        </div>
+      </div>
+
+      <div class="group" id="qualityGroup">
+        <div class="group-title">JPEG 质量</div>
+        <div class="seg" id="qualityPresets" role="group" aria-label="质量快捷键">
+          <button type="button" data-q="0.92" aria-pressed="false">小体积 .92</button>
+          <button type="button" data-q="0.95" aria-pressed="true">均衡 .95</button>
+          <button type="button" data-q="1" aria-pressed="false">保真 1.00</button>
+        </div>
+        <div class="field">
+          <div class="row"><label for="quality">手动微调</label><span class="val" id="qualityVal">0.95</span></div>
+          <input type="range" id="quality" min="0.5" max="1" value="0.95" step="0.01">
+        </div>
+        <div class="note">
+          <b>实测数据</b>（1600×1067 测试图，与水印版逐像素比对）：<br>
+          质量 1.00 → <b>99.8%</b> 像素与原图零误差，PSNR 71dB<br>
+          质量 0.95 → 89.7% 零误差，体积约为 1.00 的一半<br>
+          质量 0.92 → 84.7% 零误差，体积最小<br><br>
+          <b>说实话：</b>画上文字就必须重新编码一次，JPEG 无法做到数学意义上的无损——格式本身如此。<br>
+          要<span style="color:var(--accent)">绝对无损</span>就选 PNG（已实测：逐字节与原图完全一致），代价是文件大几倍。
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">输出尺寸</div>
+        <div class="seg" id="sizeSeg" role="group" aria-label="输出尺寸">
+          <button type="button" data-size="0" aria-pressed="true">原始尺寸</button>
+          <button type="button" data-size="4096" aria-pressed="false">长边 4096</button>
+          <button type="button" data-size="2560" aria-pressed="false">长边 2560</button>
+          <button type="button" data-size="1600" aria-pressed="false">长边 1600</button>
+        </div>
+        <div class="note" id="sizeNote">原始尺寸导出时，像素完全不缩放，画质只受上面质量档影响。</div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">元数据</div>
+        <label class="check" style="padding:10px 11px" id="keepExifWrap">
+          <input type="checkbox" id="keepExif" checked>
+          <span>保留拍摄信息与版权（推荐）</span>
+        </label>
+        <div class="note">
+          原封不动写回：相机 / 镜头 / 拍摄参数 / GPS / 作者 / 版权，以及 <b>XMP</b>（星标、关键词、修图参数）和 <b>IPTC</b>。
+          分享出去别人还能查到参数，也不会把你在 Lightroom 里打的星标弄丢。
+        </div>
+        <label class="check" style="padding:10px 11px;margin-top:2px" id="keepColorWrap">
+          <input type="checkbox" id="keepColor" checked>
+          <span>保留原色彩配置（Adobe RGB 不丢色）</span>
+        </label>
+        <div class="note" id="colorNote">
+          检测中…
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">文件命名</div>
+        <div class="field">
+          <label class="lbl" for="nameSuffix">文件名后缀</label>
+          <input type="text" id="nameSuffix" value="_stamp" maxlength="24">
+        </div>
+      </div>
+
+      <div class="group">
+        <button class="btn btn-primary btn-block" id="btnExportAll2" type="button">
+          <svg viewBox="0 0 24 24"><path d="M12 4v11M12 15l-4-4M12 15l4-4"/><path d="M5 19h14"/></svg>
+          全部导出
+        </button>
+        <div class="note" id="exportEst">载入照片后会显示预估信息。</div>
+      </div>
+    </div>
+  </aside>
+
+</main>
+
+<div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="false"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   光影印章 — 照片 EXIF 水印工具
+   零依赖单文件实现：
+     1) 自研 EXIF 解析（JPEG APP1 / PNG eXIf / WebP EXIF）
+     2) Canvas 实时预览 + 原尺寸重绘导出
+     3) JPEG 导出时把原始 EXIF 回写（含方向校正）
+   ============================================================ */
+
+/* ---------------- 常量 ---------------- */
+const CANVAS_FONT_STACK = '"Inter","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif';
+const PREVIEW_MAX = 1600;      // 预览 canvas 长边上限（性能）
+const THUMB_MAX = 240;         // 缩略图长边（触屏 DPR 高，留足余量）
+
+/* -------- 设备能力探测 --------
+   手机浏览器的画布内存远比桌面紧张：iOS Safari 尤其严格，
+   一张 4000×3000 的图（12MP）勉强能画，4800 万像素的会直接失败。
+   所以上限按设备分档，并在失败时自动降级，而不是给用户一个白屏。 */
+const UA = navigator.userAgent || "";
+const IS_IOS = /iPad|iPhone|iPod/.test(UA) ||
+               (navigator.platform === "MacIntel" && (navigator.maxTouchPoints || 0) > 1);
+const IS_ANDROID = /Android|HarmonyOS/i.test(UA);
+const IS_MOBILE = IS_IOS || IS_ANDROID || /Mobile/i.test(UA);
+const IS_TOUCH = (navigator.maxTouchPoints || 0) > 0 ||
+                 (window.matchMedia && matchMedia("(pointer:coarse)").matches);
+
+// 画布像素上限（面积）
+const CANVAS_LIMIT = IS_IOS ? 16777216        // iOS：约 4096×4096
+                   : IS_ANDROID ? 33554432    // 安卓：约 5800×5800
+                   : 268435456;               // 桌面 Chrome / Edge / Safari
+// 原尺寸搞不定时自动降级到的长边
+const FALLBACK_LONG_EDGE = 2560;
+
+const ANCHORS = {
+  'top-left':    ['top','left'],
+  'top':         ['top','center'],
+  'top-right':   ['top','right'],
+  'left':        ['middle','left'],
+  'center':      ['middle','center'],
+  'right':       ['middle','right'],
+  'bottom-left': ['bottom','left'],
+  'bottom':      ['bottom','center'],
+  'bottom-right':['bottom','right']
+};
+
+/* 模板描述符
+   bled     通栏（水印块横向铺满可用宽度）
+   bg       底衬默认不透明度（切模板时写入 bgOpacity）
+   align    单行文字对齐：left / center / right
+   twoCol   首行「机型左 + 参数右」两列排布
+   padMul   内边距倍率      sizeMul  字号倍率（做「微标」用）
+   shadow   文字投影        border   底衬描边
+   hairline 文字上方细线    perfor   胶片齿孔
+   notch    票根缺口        frame    白框（画布会变大，照片不裁切）
+   defaults 切到该模板时一并套用的颜色等 */
+const TEMPLATES = {
+  bar:      { name:'底部通栏', anchor:'bottom',       bled:true,  bg:.55, align:'left',   radius:0,  twoCol:true,  padMul:1.0,  accent:'barTop' },
+  card:     { name:'右下卡片', anchor:'bottom-right', bled:false, bg:.60, align:'left',   radius:14, twoCol:false, padMul:1.15 },
+  minimal:  { name:'极简无衬', anchor:'bottom-left',  bled:false, bg:0,   align:'left',   radius:0,  twoCol:false, shadow:true, padMul:0.6 },
+  center:   { name:'居中铭牌', anchor:'bottom',       bled:true,  bg:0,   align:'center', radius:0,  twoCol:false, shadow:true, padMul:0.7, rule:true },
+
+  hairline: { name:'细线极简', anchor:'bottom-left',  bled:false, bg:0,   align:'left',   radius:0,  twoCol:false, shadow:true, padMul:0.7, hairline:true },
+  corner:   { name:'角落微标', anchor:'bottom-right', bled:false, bg:0,   align:'right',  radius:0,  twoCol:false, shadow:true, padMul:0.42, sizeMul:0.66 },
+  glass:    { name:'玻璃卡片', anchor:'bottom-left',  bled:false, bg:.30, align:'left',   radius:18, twoCol:false, padMul:1.2,  border:true, shadow:true,
+              defaults:{ bgColor:'#0d1117', textColor:'#ffffff', accentColor:'#7dd3fc', bgOpacity:30 } },
+  polaroid: { name:'白框留白', anchor:'bottom',       bled:true,  bg:0,   align:'center', radius:0,  twoCol:false, padMul:1.0,  frame:true,
+              defaults:{ bgColor:'#ffffff', textColor:'#1b1b1b', accentColor:'#b8860b', bgOpacity:0 } },
+  film:     { name:'胶片条',   anchor:'bottom',       bled:true,  bg:.94, align:'left',   radius:0,  twoCol:true,  padMul:1.1,  perfor:true,
+              defaults:{ bgColor:'#0b0b0c', textColor:'#f4f4f5', accentColor:'#e6b422', bgOpacity:94 } },
+  ticket:   { name:'票根',     anchor:'bottom-right', bled:false, bg:.90, align:'left',   radius:6,  twoCol:false, padMul:1.3,  notch:true,
+              defaults:{ bgColor:'#17110b', textColor:'#fdf6e6', accentColor:'#e0a34a', bgOpacity:90 } }
+};
+
+const FIELD_GROUPS = [
+  { title:'机身', items:[
+      {key:'make',  label:'相机厂商', get:m=>m.make},
+      {key:'model', label:'相机型号', get:m=>m.model}
+  ]},
+  { title:'镜头', items:[
+      {key:'lens',    label:'镜头型号', get:m=>m.lens},
+      {key:'lensMake',label:'镜头厂商', get:m=>m.lensMake},
+      {key:'focal',   label:'焦距',     get:m=>m.focal? m.focal+'mm' : ''},
+      {key:'focal35', label:'等效焦距', get:m=>m.focal35? m.focal35+'mm' : ''}
+  ]},
+  { title:'拍摄参数', items:[
+      {key:'aperture',label:'光圈',     get:m=>m.fNumber? 'f/'+m.fNumber : ''},
+      {key:'shutter', label:'快门',     get:m=>m.shutter},
+      {key:'iso',     label:'感光度',   get:m=>m.iso? 'ISO '+m.iso : ''},
+      {key:'ev',      label:'曝光补偿', get:m=>m.ev},
+      {key:'program', label:'曝光模式', get:m=>m.program},
+      {key:'metering',label:'测光模式', get:m=>m.metering},
+      {key:'wb',      label:'白平衡',   get:m=>m.wb}
+  ]},
+  { title:'其他信息', items:[
+      {key:'date',     label:'拍摄时间', get:m=>m.dateText},
+      {key:'dims',     label:'图片尺寸', get:m=>m.dims},
+      {key:'gps',      label:'GPS 位置', get:m=>m.gpsText},
+      {key:'software', label:'处理软件', get:m=>m.software},
+      {key:'artist',   label:'作者',     get:m=>m.artist},
+      {key:'copyright',label:'版权',     get:m=>m.copyright},
+      {key:'custom',   label:'自定义文字', get:(m,cfg)=>cfg.customText}
+  ]}
+];
+
+const DEFAULT_FIELDS = ['make','model','lens','focal','aperture','shutter','iso'];
+const SEPARATORS = [' ', ' | ', ' · ', ' / '];
+
+const DEFAULT_STYLE = {
+  template:'bar', anchor:'bottom', offsetX:0, offsetY:0,
+  sizeScale:2.2,             // 整体大小（文字与留白一起缩放）
+  padScale:1,                // 相对留白倍率
+  lineGap:1.34,              // 行间距
+  marginMul:1,               // 距画面边缘距离倍率
+  bgOpacity:55, sep:2, radius:14, boldTitle:true,
+  textColor:'#ffffff', bgColor:'#000000', accentColor:'#fbbf24',
+  customText:'', sigText:'', sigAlign:'right',
+  logo:'', logoPos:'left', logoScale:1.15, logoOpacity:100,
+  readableModel:true
+};
+const DEFAULT_EXPORT = { format:'source', quality:.95, maxSize:0, keepExif:true, keepColor:true, suffix:'_stamp' };
+
+/* ---------------- 全局状态 ---------------- */
+const state = {
+  items: [],        // {id,name,file,img,meta,thumb,width,height,style?}
+  active: -1,
+  fields: {},       // key -> bool
+  style: Object.assign({}, DEFAULT_STYLE),
+  exp: Object.assign({}, DEFAULT_EXPORT),
+  previewScale: 1,
+  busy: false,
+  multiMode: 'global'   // 'global' 全部照片共用一套版式 | 'per' 每张单独调整
+};
+DEFAULT_FIELDS.forEach(k => state.fields[k] = true);
+
+/* 当前生效的版式：默认是全局那套；开「每张单独调整」后是这张图自己的 */
+function ST(){
+  const it = current();
+  if(state.multiMode === 'per' && it){
+    if(!it.style) it.style = Object.assign({}, state.style);
+    return it.style;
+  }
+  return state.style;
+}
+/* 版式是否已经和全局不一样（用于缩略图上打标记） */
+function styleDiffers(it){
+  if(!it || !it.style) return false;
+  return JSON.stringify(it.style) !== JSON.stringify(state.style);
+}
+
+/* ---------------- DOM ---------------- */
+const $ = s => document.querySelector(s);
+const dom = {
+  fileInput: $('#fileInput'), dropzone:$('#dropzone'), dropzoneHost:$('#dropzoneHost'),
+  canvasHost:$('#canvasHost'), canvas:$('#preview'),
+  thumbs:$('#thumbs'), stageTools:$('#stageTools'), stageMeta:$('#stageMeta'),
+  exifBox:$('#exifBox'), exifBody:$('#exifBody'), detectNote:$('#detectNote'),
+  fieldGroups:$('#fieldGroups'), tplGrid:$('#tplGrid'), anchorGrid:$('#anchorGrid'),
+  toastHost:$('#toastHost'), exportEst:$('#exportEst'), qualityGroup:$('#qualityGroup'),
+  sizeNote:$('#sizeNote'), colorNote:$('#colorNote'), readableModel:$('#readableModel'),
+  logoSlot:$('#logoSlot'), logoInput:$('#logoInput'), presetList:$('#presetList'),
+  presetName:$('#presetName'), presetFile:$('#presetFile'), multiSeg:$('#multiSeg'),
+  btnApplyAll:$('#btnApplyAll'), multiNote:$('#multiNote')
+};
+const ctx = dom.canvas.getContext('2d');
+
+/* ============================================================
+   1. EXIF 解析
+   ============================================================ */
+
+const TAGS_IFD0 = {
+  0x010F:'Make', 0x0110:'Model', 0x0112:'Orientation', 0x0131:'Software',
+  0x0132:'ModifyDate', 0x013B:'Artist', 0x8298:'Copyright',
+  0x8769:'_ExifIFD', 0x8825:'_GPSIFD', 0xA430:'CameraOwnerName', 0xA431:'BodySerialNumber',
+  0xA433:'LensMake', 0xA434:'LensModel', 0xA435:'LensSerialNumber', 0xA432:'LensSpecification',
+  // 出现在 SubIFD 里：Sony ARW 的原始像素尺寸
+  0x0100:'_SubW', 0x0101:'_SubH'
+};
+const TAGS_EXIF = {
+  0x829A:'ExposureTime', 0x829D:'FNumber', 0x8822:'ExposureProgram', 0x8827:'ISOSpeedRatings',
+  0x9003:'DateTimeOriginal', 0x9004:'CreateDate', 0x9201:'ShutterSpeedValue',
+  0x9202:'ApertureValue', 0x9204:'ExposureBiasValue', 0x9207:'MeteringMode',
+  0x9208:'LightSource', 0x9209:'Flash', 0x920A:'FocalLength', 0x9286:'UserComment',
+  0xA001:'ColorSpace', 0xA002:'PixelXDimension', 0xA003:'PixelYDimension',
+  0xA402:'ExposureMode', 0xA403:'WhiteBalance', 0xA405:'FocalLengthIn35mmFilm',
+  0xA406:'SceneCaptureType', 0xA433:'LensMake', 0xA434:'LensModel', 0x8830:'SensitivityType'
+};
+const TAGS_GPS = {
+  0x0001:'GPSLatitudeRef', 0x0002:'GPSLatitude', 0x0003:'GPSLongitudeRef',
+  0x0004:'GPSLongitude', 0x0005:'GPSAltitudeRef', 0x0006:'GPSAltitude',
+  0x0007:'GPSTimeStamp', 0x001D:'GPSDateStamp'
+};
+const TYPE_SIZE = {1:1,2:1,3:2,4:4,5:8,6:1,7:1,8:2,9:4,10:8,11:4,12:8};
+
+/** 从任意图片 ArrayBuffer 中定位 TIFF 数据块（返回 Uint8Array，起点即 TIFF header） */
+function locateTiff(buf){
+  const b = new Uint8Array(buf);
+  if(b.length < 12) return null;
+
+  // --- JPEG ---
+  if(b[0]===0xFF && b[1]===0xD8){
+    let i = 2;
+    while(i < b.length - 4){
+      if(b[i] !== 0xFF){ i++; continue; }
+      const m = b[i+1];
+      if(m===0xD8 || m===0x01 || (m>=0xD0 && m<=0xD7)){ i += 2; continue; }
+      if(m===0xDA || m===0xD9) break;
+      const len = (b[i+2]<<8) | b[i+3];
+      if(len < 2) break;
+      if(m===0xE1){
+        // 标准写法：APP1 带 "Exif\0\0" 签名
+        if(b[i+4]===0x45 && b[i+5]===0x78 && b[i+6]===0x69 && b[i+7]===0x66){
+          return b.subarray(i+10);
+        }
+        // 少数软件写出的 APP1 直接就是 TIFF 头（没有 Exif 签名），同样按 EXIF 处理
+        if((b[i+4]===0x49 && b[i+5]===0x49) || (b[i+4]===0x4D && b[i+5]===0x4D)){
+          return b.subarray(i+4);
+        }
+      }
+      i += 2 + len;
+    }
+    return null;
+  }
+
+  // --- TIFF 容器：Sony ARW / DNG / 各类 RAW 与 .tif ---
+  // 这类文件本身就是 TIFF，EXIF 就在 IFD0 里，直接整个交给 parseTiff。
+  if((b[0]===0x49 && b[1]===0x49 && b[2]===0x2A && b[3]===0x00) ||
+     (b[0]===0x4D && b[1]===0x4D && b[2]===0x00 && b[3]===0x2A)){
+    return b;
+  }
+
+  // --- PNG (eXIf chunk，内容直接是 TIFF) ---
+  if(b[0]===0x89 && b[1]===0x50 && b[2]===0x4E && b[3]===0x47){
+    let i = 8;
+    while(i + 8 < b.length){
+      const len = (b[i]<<24) | (b[i+1]<<16) | (b[i+2]<<8) | b[i+3];
+      const type = String.fromCharCode(b[i+4],b[i+5],b[i+6],b[i+7]);
+      if(type === 'eXIf') return b.subarray(i+8, i+8+len);
+      if(type === 'IEND') break;
+      i += 12 + len;
+    }
+    return null;
+  }
+
+  // --- WebP (RIFF EXIF chunk) ---
+  if(b[0]===0x52 && b[1]===0x49 && b[2]===0x46 && b[3]===0x46){
+    let i = 12;
+    while(i + 8 < b.length){
+      const type = String.fromCharCode(b[i],b[i+1],b[i+2],b[i+3]);
+      const len = b[i+4] | (b[i+5]<<8) | (b[i+6]<<16) | (b[i+7]<<24);
+      if(type === 'EXIF'){
+        let s = b.subarray(i+8, i+8+len);
+        if(s[0]===0x45 && s[1]===0x78 && s[2]===0x69 && s[3]===0x66) s = s.subarray(6);
+        return s;
+      }
+      i += 8 + len + (len % 2);
+    }
+    return null;
+  }
+  return null;
+}
+
+/** 解析 TIFF 块 → 扁平 tag 字典 */
+function parseTiff(tiff){
+  const dv = new DataView(tiff.buffer, tiff.byteOffset, tiff.byteLength);
+  const b0 = dv.getUint8(0), b1 = dv.getUint8(1);
+  let le;
+  if(b0===0x49 && b1===0x49) le = true;
+  else if(b0===0x4D && b1===0x4D) le = false;
+  else return {};
+
+  if(dv.getUint16(2, le) !== 0x2A) return {};
+
+  const out = { __previews: [] };
+  const seen = new Set();
+
+  function readEntry(eOff, tagMap, into){
+    const tag = dv.getUint16(eOff, le);
+    const type = dv.getUint16(eOff+2, le);
+    const count = dv.getUint32(eOff+4, le);
+    const size = TYPE_SIZE[type];
+    if(!size) return null;
+    const total = size * count;
+    let vOff = eOff + 8;
+    if(total > 4){
+      vOff = dv.getUint32(eOff+8, le);
+      if(vOff + total > dv.byteLength) return null;
+    }
+    const name = tagMap ? tagMap[tag] : undefined;
+    if(!name) return null;
+
+    let val;
+    if(type === 2){ // ASCII
+      let s = '';
+      for(let i=0;i<count;i++){
+        const c = dv.getUint8(vOff+i);
+        if(c === 0) break;
+        s += String.fromCharCode(c);
+      }
+      val = s.trim();
+    } else if(type === 7){ // UNDEFINED
+      val = '<' + count + ' bytes>';
+    } else {
+      const arr = [];
+      for(let i=0;i<count;i++){
+        const p = vOff + i*size;
+        switch(type){
+          case 1: arr.push(dv.getUint8(p)); break;
+          case 3: arr.push(dv.getUint16(p, le)); break;
+          case 4: arr.push(dv.getUint32(p, le)); break;
+          case 6: arr.push(dv.getInt8(p)); break;
+          case 8: arr.push(dv.getInt16(p, le)); break;
+          case 9: arr.push(dv.getInt32(p, le)); break;
+          case 5: arr.push(dv.getUint32(p, le) / (dv.getUint32(p+4, le) || 1)); break;
+          case 10: arr.push(dv.getInt32(p, le) / (dv.getInt32(p+4, le) || 1)); break;
+          case 11: arr.push(dv.getFloat32(p, le)); break;
+          case 12: arr.push(dv.getFloat64(p, le)); break;
+        }
+      }
+      val = count === 1 ? arr[0] : arr;
+    }
+    if(val !== '' && val !== undefined && val !== null){
+      into[name] = val;
+      out[name] = val;
+    }
+    return tag;
+  }
+
+  function walk(ifdOff, tagMap, depth){
+    if(depth > 4 || ifdOff <= 0 || ifdOff + 2 > dv.byteLength) return;
+    const key = ifdOff + ':' + depth;
+    if(seen.has(key)) return;
+    seen.add(key);
+
+    const n = dv.getUint16(ifdOff, le);
+    if(n > 512) return;
+    const children = [];
+    let pvOff = 0, pvLen = 0;
+    for(let i=0;i<n;i++){
+      const eOff = ifdOff + 2 + i*12;
+      if(eOff + 12 > dv.byteLength) break;
+      const tagId = dv.getUint16(eOff, le);
+      const tag = readEntry(eOff, tagMap, out);
+      if(tag === 0x8769) children.push([dv.getUint32(eOff+8, le), TAGS_EXIF, depth+1]);
+      if(tag === 0x8825) children.push([dv.getUint32(eOff+8, le), TAGS_GPS, depth+1]);
+      // SubIFD：Sony ARW 的原始数据挂在这里
+      if(tagId === 0x014A){
+        const sType = dv.getUint16(eOff+2, le), sCnt = dv.getUint32(eOff+4, le);
+        const first = (sType === 4 && sCnt >= 1)
+          ? (sCnt === 1 ? dv.getUint32(eOff+8, le) : dv.getUint32(dv.getUint32(eOff+8, le), le))
+          : 0;
+        if(first > 8 && first + 4 <= dv.byteLength) children.push([first, TAGS_IFD0, depth+1]);
+      }
+      // 内嵌 JPEG 预览的起点 / 长度（TIFF 系 RAW 靠这两个标签定位预览图）
+      if(tagId === 0x0201) pvOff = dv.getUint32(eOff+8, le);
+      else if(tagId === 0x0202) pvLen = dv.getUint32(eOff+8, le);
+    }
+    if(pvOff > 0 && pvLen > 0) out.__previews.push({ off: pvOff, len: pvLen });
+    children.forEach(c => walk(c[0], c[1], c[2]));
+  }
+
+  const ifd0 = dv.getUint32(4, le);
+  walk(ifd0, TAGS_IFD0, 0);
+  return out;
+}
+
+/* ---------------- 数值格式化 ---------------- */
+function round1(v){ return Math.round(v*10)/10; }
+
+function fmtShutter(v){
+  if(!v && v !== 0) return '';
+  if(v >= 1) return (round1(v)) + 's';
+  const d = Math.round(1/v);
+  return '1/' + d + 's';
+}
+function fmtAperture(v){ return v ? 'f/' + round1(v) : ''; }
+function fmtFocal(v){ return v ? (Number.isInteger(v) ? v : round1(v)) + 'mm' : ''; }
+function fmtEV(v){
+  if(v === undefined || v === null || v === '') return '';
+  const n = round1(v);
+  if(n === 0) return '0EV';
+  return (n > 0 ? '+' : '') + n + 'EV';
+}
+function fmtDate(s){
+  if(!s) return '';
+  const m = String(s).match(/^(\d{4})[:\-](\d{2})[:\-](\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+  if(!m) return String(s);
+  return m[1] + '-' + m[2] + '-' + m[3] + ' ' + m[4] + ':' + m[5] + ':' + m[6];
+}
+const PROGRAMS = {0:'未定义',1:'手动',2:'程序自动',3:'光圈优先',4:'快门优先',5:'创意',6:'运动',7:'人像',8:'风景',9:'微距'};
+const METERING = {0:'未知',1:'平均',2:'中央重点',3:'点测光',4:'多点',5:'评价测光',6:'局部'};
+const FLASH = {0:'未闪光',1:'闪光',5:'闪光(红眼)',7:'闪光(红眼/强制)',9:'闪光(强制)',16:'未闪光(强制)',24:'未闪光(自动)'};
+
+function gpsToDecimal(coord, ref){
+  if(!Array.isArray(coord) || coord.length < 3) return null;
+  const dec = coord[0] + coord[1]/60 + coord[2]/3600;
+  const sign = (ref === 'S' || ref === 'W') ? -1 : 1;
+  return dec * sign;
+}
+
+/** 把原始 tag 字典整理成展示用元数据 */
+function buildMeta(raw, imgW, imgH){
+  const m = {};
+  m.make = (raw.Make || '').replace(/\s+/g,' ').trim();
+  m.model = (raw.Model || '').replace(/\s+/g,' ').trim();
+  // 有些机型 Model 里已经带厂商名，去重
+  if(m.make && m.model){
+    const mk = m.make.toLowerCase();
+    if(m.model.toLowerCase().indexOf(mk) === 0){
+      m.model = m.model.slice(m.make.length).trim();
+    }
+  }
+  m.lens = (raw.LensModel || '').replace(/\s+/g,' ').trim();
+  m.lensMake = (raw.LensMake || '').trim();
+
+  m.focal = raw.FocalLength ? round1(raw.FocalLength) : null;
+  m.focal35 = raw.FocalLengthIn35mmFilm || null;
+  m.fNumber = raw.FNumber ? round1(raw.FNumber) : null;
+  m.shutter = fmtShutter(raw.ExposureTime);
+  m.iso = raw.ISOSpeedRatings || null;
+  m.ev = fmtEV(raw.ExposureBiasValue);
+  m.program = PROGRAMS[raw.ExposureProgram] || '';
+  m.metering = METERING[raw.MeteringMode] || '';
+  m.wb = raw.WhiteBalance === 0 ? '自动白平衡' : (raw.WhiteBalance === 1 ? '手动白平衡' : '');
+  m.flash = FLASH[raw.Flash] || '';
+
+  m.dateText = fmtDate(raw.DateTimeOriginal || raw.CreateDate || raw.ModifyDate);
+  m.dims = (imgW && imgH) ? imgW + ' × ' + imgH : '';
+  m.software = raw.Software || '';
+  m.artist = raw.Artist || '';
+  m.copyright = raw.Copyright || '';
+  m.orientation = raw.Orientation || 1;
+
+  const lat = gpsToDecimal(raw.GPSLatitude, raw.GPSLatitudeRef);
+  const lon = gpsToDecimal(raw.GPSLongitude, raw.GPSLongitudeRef);
+  if(lat !== null && lon !== null && !isNaN(lat) && !isNaN(lon)){
+    const ns = lat >= 0 ? 'N' : 'S', ew = lon >= 0 ? 'E' : 'W';
+    m.gpsText = Math.abs(lat).toFixed(4) + '°' + ns + ' ' + Math.abs(lon).toFixed(4) + '°' + ew;
+  } else {
+    m.gpsText = '';
+  }
+  m.raw = raw;
+  m.modelNice = niceModel(m.make, m.model);
+  return m;
+}
+
+/* ============================================================
+   1.5 机型易读名 / 色彩配置 / 元数据段 / RAW 内嵌预览
+   ============================================================ */
+
+/** 索尼机身号 → 大家实际叫的名字。ILCE-1 写在 EXIF 里，但没人管 A1 叫「ILCE-1」。 */
+const MODEL_ALIAS = {
+  'ILCE-1':'A1', 'ILCE-1M2':'A1 II',
+  'ILCE-7M2':'A7 II', 'ILCE-7M3':'A7 III', 'ILCE-7M4':'A7 IV', 'ILCE-7M5':'A7 V',
+  'ILCE-7RM2':'A7R II', 'ILCE-7RM3':'A7R III', 'ILCE-7RM3A':'A7R III',
+  'ILCE-7RM4':'A7R IV', 'ILCE-7RM4A':'A7R IV', 'ILCE-7RM5':'A7R V',
+  'ILCE-7SM2':'A7S II', 'ILCE-7SM3':'A7S III',
+  'ILCE-7C':'A7C', 'ILCE-7CM2':'A7C II', 'ILCE-7CR':'A7CR',
+  'ILCE-9':'A9', 'ILCE-9M2':'A9 II', 'ILCE-9M3':'A9 III',
+  'ILCE-6000':'A6000', 'ILCE-6100':'A6100', 'ILCE-6300':'A6300', 'ILCE-6400':'A6400',
+  'ILCE-6500':'A6500', 'ILCE-6600':'A6600', 'ILCE-6700':'A6700',
+  'DSC-RX1RM2':'RX1R II', 'DSC-RX100M5A':'RX100 V', 'DSC-RX100M6':'RX100 VI',
+  'DSC-RX100M7':'RX100 VII', 'DSC-RX10M4':'RX10 IV', 'DSC-RX0M2':'RX0 II'
+};
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
+
+function niceModel(make, model){
+  if(!model) return '';
+  const key = String(model).toUpperCase().replace(/\s+/g, '');
+  if(MODEL_ALIAS[key]) return MODEL_ALIAS[key];
+  if(/SONY|索尼/i.test(make || '')){
+    // 兜底：ILCE-<数字><字母>M<代数> → A<数字><字母> <罗马数字>
+    const m = key.match(/^ILCE-?(\d+)([A-Z]*?)M?(\d+)$/);
+    if(m){
+      const gen = ROMAN[Number(m[3])] || m[3];
+      return 'A' + m[1] + m[2] + ' ' + gen;
+    }
+    const m2 = key.match(/^ILCE-?(\d+)([A-Z]+)$/);
+    if(m2 && m2[2] !== 'M') return 'A' + m2[1] + m2[2];
+  }
+  return model;
+}
+
+/* ---------------- 字节工具 ---------------- */
+function concatU8(list){
+  let n = 0;
+  list.forEach(a => n += a.length);
+  const out = new Uint8Array(n);
+  let p = 0;
+  list.forEach(a => { out.set(a, p); p += a.length; });
+  return out;
+}
+function matchSig(b, at, str){
+  if(at + str.length > b.length) return false;
+  for(let i=0;i<str.length;i++) if(b[at+i] !== str.charCodeAt(i)) return false;
+  return true;
+}
+
+/* ---------------- 色彩配置（ICC）--------------- */
+/**
+ * 从原图里取出 ICC 色彩配置文件。
+ * JPEG 在 APP2（可能分块）、PNG 在 iCCP（zlib 压缩）、WebP 在 ICCP。
+ */
+async function locateIcc(buf){
+  const b = new Uint8Array(buf);
+  if(b.length < 16) return null;
+
+  if(b[0]===0xFF && b[1]===0xD8){
+    const chunks = [];
+    let i = 2;
+    while(i < b.length - 4){
+      if(b[i] !== 0xFF){ i++; continue; }
+      const m = b[i+1];
+      if(m===0xD8 || m===0x01 || (m>=0xD0 && m<=0xD7)){ i += 2; continue; }
+      if(m===0xDA || m===0xD9) break;
+      const len = (b[i+2]<<8) | b[i+3];
+      if(len < 2) break;
+      if(m===0xE2 && matchSig(b, i+4, 'ICC_PROFILE\x00')){
+        const seq = b[i+16], cnt = b[i+17];
+        chunks.push({ seq, data: b.subarray(i+18, i+2+len) });
+      }
+      i += 2 + len;
+    }
+    if(chunks.length){
+      chunks.sort((x, y) => x.seq - y.seq);
+      return concatU8(chunks.map(c => c.data));
+    }
+    return null;
+  }
+
+  if(b[0]===0x89 && b[1]===0x50 && b[2]===0x4E && b[3]===0x47){
+    let i = 8;
+    while(i + 12 <= b.length){
+      const len = (b[i]<<24) | (b[i+1]<<16) | (b[i+2]<<8) | b[i+3];
+      const type = String.fromCharCode(b[i+4],b[i+5],b[i+6],b[i+7]);
+      if(len < 0 || i + 12 + len > b.length) break;
+      if(type === 'iCCP'){
+        let p = i + 8;
+        const end = p + len;
+        while(p < end && b[p] !== 0) p++;
+        p++;
+        if(b[p] !== 0) return null;
+        p++;
+        return await inflateZlib(b.subarray(p, end));
+      }
+      if(type === 'IEND') break;
+      i += 12 + len;
+    }
+    return null;
+  }
+
+  if(b[0]===0x52 && b[1]===0x49 && b[2]===0x46 && b[3]===0x46){
+    let i = 12;
+    while(i + 8 <= b.length){
+      const type = String.fromCharCode(b[i],b[i+1],b[i+2],b[i+3]);
+      const len = b[i+4] | (b[i+5]<<8) | (b[i+6]<<16) | (b[i+7]<<24);
+      if(type === 'ICCP') return b.slice(i+8, i+8+len);
+      i += 8 + len + (len % 2);
+    }
+    return null;
+  }
+  return null;
+}
+
+async function streamZlib(bytes, mode){  if(typeof (mode === 'd' ? DecompressionStream : CompressionStream) === 'undefined') return null;
+  try{
+    const S = mode === 'd' ? DecompressionStream : CompressionStream;
+    const s = new Blob([bytes]).stream().pipeThrough(new S('deflate'));
+    return new Uint8Array(await new Response(s).arrayBuffer());
+  }catch(e){ return null; }
+}
+const inflateZlib = bytes => streamZlib(bytes, 'd');
+const deflateZlib = bytes => streamZlib(bytes, 'c');
+
+/** 读 ICC 里的描述文字（顺带判断是不是宽色域配置） */
+function iccDescription(icc){
+  if(!icc || icc.length < 132) return '';
+  const dv = new DataView(icc.buffer, icc.byteOffset, icc.byteLength);
+  const n = dv.getUint32(128, false);
+  if(n > 64) return '';
+  let descOff = -1, mlucOff = -1;
+  for(let i=0;i<n;i++){
+    const e = 132 + i*12;
+    if(e + 12 > icc.length) break;
+    const sig = String.fromCharCode(icc[e],icc[e+1],icc[e+2],icc[e+3]);
+    if(sig === 'desc') descOff = dv.getUint32(e+4, false);
+    if(sig === 'mluc') mlucOff = dv.getUint32(e+4, false);
+  }
+  try{
+    if(descOff > 0 && descOff + 12 < icc.length){
+      const len = dv.getUint32(descOff+8, false);
+      let s = '';
+      for(let i=0;i<Math.min(len, 128);i++){
+        const ch = icc[descOff+12+i];
+        if(!ch) break;
+        s += String.fromCharCode(ch);
+      }
+      if(s.trim()) return s.trim();
+    }
+    if(mlucOff > 0 && mlucOff + 28 < icc.length){
+      const cnt = dv.getUint32(mlucOff+8, false);
+      if(cnt >= 1){
+        const len = dv.getUint32(mlucOff+20, false);
+        const off = dv.getUint32(mlucOff+24, false);
+        let s = '';
+        for(let i=0;i<len/2;i++){
+          const ch = dv.getUint16(mlucOff+off+i*2, false);
+          if(!ch) break;
+          s += String.fromCharCode(ch);
+        }
+        return s.trim();
+      }
+    }
+  }catch(e){}
+  return '';
+}
+
+const WIDE_RE = /adobe\s*rgb|prophoto|romm|display\s*p3|wide\s*gamut|rec\.?\s*2020|aces/i;
+
+/**
+ * 探测「浏览器是否真的按原样解码」。
+ * 用同一张图分别以默认方式与 colorSpaceConversion:'none' 解码，
+ * 若像素有差异，说明这张图带了非 sRGB 配置、且浏览器支持不转换解码。
+ * 返回最大通道差（0 表示没差异或浏览器不支持）。
+ */
+async function probeDecodeNoConvert(blob){
+  let b1 = null, b2 = null;
+  try{
+    const opt = { resizeWidth: 192, resizeHeight: 192, resizeQuality: 'low' };
+    b1 = await createImageBitmap(blob, opt);
+    b2 = await createImageBitmap(blob, Object.assign({}, opt, { colorSpaceConversion: 'none' }));
+    const read = bmp => {
+      const c = document.createElement('canvas');
+      c.width = bmp.width; c.height = bmp.height;
+      const g = c.getContext('2d');
+      g.drawImage(bmp, 0, 0);
+      return g.getImageData(0, 0, bmp.width, bmp.height).data;
+    };
+    const d1 = read(b1), d2 = read(b2);
+    if(d1.length !== d2.length) return 0;
+    let max = 0;
+    for(let i=0;i<d1.length;i+=4){
+      max = Math.max(max, Math.abs(d1[i]-d2[i]), Math.abs(d1[i+1]-d2[i+1]), Math.abs(d1[i+2]-d2[i+2]));
+      if(max > 40) break;
+    }
+    return max;
+  }catch(e){
+    return 0;
+  }finally{
+    if(b1 && b1.close) b1.close();
+    if(b2 && b2.close) b2.close();
+  }
+}
+
+/* ---------------- RAW / TIFF：从 TIFF 容器里挖内嵌 JPEG 预览 ---------------- */
+function extractEmbeddedJpeg(tiff, raw){
+  if(!tiff) return null;
+  const bytes = tiff instanceof Uint8Array ? tiff : new Uint8Array(tiff);
+  const list = (raw && raw.__previews) ? raw.__previews.slice() : [];
+  if(!list.length) return null;
+  // 预览可能有多张（大预览 + 缩略图），取最大的那张
+  list.sort((a, b) => b.len - a.len);
+  for(const p of list){
+    if(p.off <= 0 || p.len < 1024) continue;
+    if(p.off + p.len > bytes.length) continue;
+    const s = bytes.subarray(p.off, p.off + p.len);
+    if(s[0] === 0xFF && s[1] === 0xD8 && s[s.length-2] === 0xFF && s[s.length-1] === 0xD9){
+      return { bytes: s, declared: p.len };
+    }
+  }
+  return null;
+}
+
+/* ---------------- JPEG 段操作 ---------------- */
+/** 列出 SOI 之后、SOS 之前的所有 APPn 段 */
+function jpegAppSegments(b){
+  const segs = [];
+  let i = 2, bodyStart = b.length;
+  while(i < b.length - 3){
+    if(b[i] !== 0xFF){ bodyStart = i; break; }
+    const m = b[i+1];
+    if(m === 0xD8 || m === 0x01 || (m >= 0xD0 && m <= 0xD7)){ i += 2; continue; }
+    if(m === 0xDA || m === 0xD9){ bodyStart = i; break; }
+    if(!(m >= 0xE0 && m <= 0xEF)){ bodyStart = i; break; }
+    const len = (b[i+2]<<8) | b[i+3];
+    if(len < 2 || i + 2 + len > b.length){ bodyStart = i; break; }
+    segs.push({ m, start: i, end: i + 2 + len });
+    i += 2 + len;
+  }
+  return { segs, bodyStart };
+}
+
+function findApp1(b, sig){
+  const { segs } = jpegAppSegments(b);
+  for(const s of segs){
+    if(s.m !== 0xE1) continue;
+    if(matchSig(b, s.start + 4, sig)) return b.slice(s.start, s.end);
+  }
+  return null;
+}
+function findIccApp2(b){
+  const { segs } = jpegAppSegments(b);
+  const out = [];
+  for(const s of segs){
+    if(s.m === 0xE2 && matchSig(b, s.start + 4, 'ICC_PROFILE\x00')) out.push(b.slice(s.start, s.end));
+  }
+  return out;
+}
+function findApp13(b){
+  const { segs } = jpegAppSegments(b);
+  for(const s of segs){
+    if(s.m === 0xED && matchSig(b, s.start + 4, 'Photoshop 3.0\x00')) return b.slice(s.start, s.end);
+  }
+  return null;
+}
+
+/** 把 ICC 打成一段或多段 APP2（超过 64KB 要分块） */
+function iccToApp2(icc){
+  const MAX = 65533 - 14;
+  const chunks = [];
+  const total = Math.max(1, Math.ceil(icc.length / MAX));
+  for(let i=0;i<total;i++){
+    const part = icc.subarray(i*MAX, Math.min(icc.length, (i+1)*MAX));
+    const payload = new Uint8Array(14 + part.length);
+    payload.set(new TextEncoder().encode('ICC_PROFILE\x00'), 0);
+    payload[12] = i + 1;
+    payload[13] = total;
+    payload.set(part, 14);
+    const seg = new Uint8Array(4 + payload.length);
+    seg[0] = 0xFF; seg[1] = 0xE2;
+    seg[2] = ((payload.length + 2) >> 8) & 0xFF;
+    seg[3] = (payload.length + 2) & 0xFF;
+    seg.set(payload, 4);
+    chunks.push(seg);
+  }
+  return chunks;
+}
+
+function buildApp1(sig, payload){
+  const head = new TextEncoder().encode(sig);
+  const seg = new Uint8Array(4 + head.length + payload.length);
+  seg[0] = 0xFF; seg[1] = 0xE1;
+  const len = head.length + payload.length + 2;
+  seg[2] = (len >> 8) & 0xFF; seg[3] = len & 0xFF;
+  seg.set(head, 4);
+  seg.set(payload, 4 + head.length);
+  return seg;
+}
+
+/**
+ * 重排 JPEG 段：丢掉画布输出里自带的 EXIF / XMP / ICC / IPTC，
+ * 换成我们自己准备的（原图里的那份）。
+ */
+function rebuildJpeg(jpeg, inserts, dropIcc){
+  const { segs, bodyStart } = jpegAppSegments(jpeg);
+  const kept = [];
+  let app0 = null;
+  for(const s of segs){
+    if(s.m === 0xE0 && !app0){ app0 = jpeg.subarray(s.start, s.end); continue; }
+    if(s.m === 0xE1) continue;                                    // 旧的 EXIF / XMP
+    if(s.m === 0xE2 && matchSig(jpeg, s.start + 4, 'ICC_PROFILE\x00') && dropIcc) continue;
+    if(s.m === 0xED) continue;                                    // 旧的 IPTC
+    kept.push(jpeg.subarray(s.start, s.end));
+  }
+  const parts = [jpeg.subarray(0, 2)];
+  if(app0) parts.push(app0);
+  inserts.forEach(s => parts.push(s));
+  kept.forEach(s => parts.push(s));
+  parts.push(jpeg.subarray(bodyStart));
+  return concatU8(parts);
+}
+
+/* ---------------- PNG 块操作 ---------------- */
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for(let n=0;n<256;n++){
+    let c = n;
+    for(let k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(bytes){
+  let c = 0xFFFFFFFF;
+  for(let i=0;i<bytes.length;i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function pngChunks(b){
+  const out = [];
+  let i = 8;
+  while(i + 12 <= b.length){
+    const len = (b[i]<<24) | (b[i+1]<<16) | (b[i+2]<<8) | b[i+3];
+    if(len < 0 || i + 12 + len > b.length) break;
+    out.push({ type:String.fromCharCode(b[i+4],b[i+5],b[i+6],b[i+7]), start:i, end:i+12+len });
+    i += 12 + len;
+  }
+  return out;
+}
+function pngChunk(type, data){
+  const out = new Uint8Array(12 + data.length);
+  out[0] = (data.length >>> 24) & 0xFF; out[1] = (data.length >>> 16) & 0xFF;
+  out[2] = (data.length >>> 8) & 0xFF;  out[3] = data.length & 0xFF;
+  for(let i=0;i<4;i++) out[4+i] = type.charCodeAt(i);
+  out.set(data, 8);
+  const crc = crc32(out.subarray(4, 8 + data.length));
+  out[8 + data.length] = (crc >>> 24) & 0xFF;
+  out[9 + data.length] = (crc >>> 16) & 0xFF;
+  out[10 + data.length] = (crc >>> 8) & 0xFF;
+  out[11 + data.length] = crc & 0xFF;
+  return out;
+}
+/** 给 PNG 换上一份 ICC：删掉会打架的 sRGB/gAMA/cHRM/iCCP，再插 iCCP */
+async function rewritePngIcc(png, icc){
+  const b = new Uint8Array(png);
+  if(!(b[0]===0x89 && b[1]===0x50)) return png;
+  const compressed = await deflateZlib(icc);
+  if(!compressed) return png;
+  const name = new TextEncoder().encode('ICC Profile\x00');
+  const data = concatU8([name, new Uint8Array([0]), compressed]);
+  const chunk = pngChunk('iCCP', data);
+
+  const chunks = pngChunks(b);
+  const parts = [b.subarray(0, 8)];
+  let inserted = false;
+  for(const c of chunks){
+    if(c.type === 'iCCP' || c.type === 'sRGB' || c.type === 'gAMA' || c.type === 'cHRM') continue;
+    parts.push(b.subarray(c.start, c.end));
+    if(c.type === 'IHDR' && !inserted){ parts.push(chunk); inserted = true; }
+  }
+  return concatU8(parts);
+}
+
+/* ---------------- sRGB → AdobeRGB（水印颜色在宽色域下不出偏差） ---------------- */
+// 由 sRGB 与 AdobeRGB(1998) 两个 profile 的 D50 矩阵数值解出，已用 lcms 双向校验：
+// 最大误差 2/255。不做这一步，「琥珀色」在 AdobeRGB 图里会偏成 (255,192,0)。
+const SRGB_TO_ADOBE_M = [
+  [ 0.7151760, 0.2847648, -0.0000238 ],
+  [ 0.0000088, 1.0000155, -0.0000238 ],
+  [ 0.0000096, 0.0412173,  0.9591780 ]
+];
+const ADOBE_GAMMA = 2.19921875;
+function s2lin(v){ return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
+function hex2rgb(h){
+  const s = String(h || '').replace('#','');
+  const n = s.length === 3 ? s.split('').map(c => c + c).join('') : s.padEnd(6, '0').slice(0, 6);
+  return [parseInt(n.slice(0,2),16), parseInt(n.slice(2,4),16), parseInt(n.slice(4,6),16)];
+}
+function rgbCss(rgb, alpha){
+  const c = rgb.map(v => Math.max(0, Math.min(255, Math.round(v))));
+  return alpha === undefined ? 'rgb(' + c.join(',') + ')' : 'rgba(' + c.join(',') + ',' + alpha + ')';
+}
+/** 把界面里选的 sRGB 颜色换算到当前工作色彩空间 */
+function cssColor(hex, alpha, wide){
+  const rgb = hex2rgb(hex);
+  if(!wide) return rgbCss(rgb, alpha);
+  const lin = rgb.map(v => s2lin(v / 255));
+  const out = [0,1,2].map(i => {
+    const v = SRGB_TO_ADOBE_M[i][0]*lin[0] + SRGB_TO_ADOBE_M[i][1]*lin[1] + SRGB_TO_ADOBE_M[i][2]*lin[2];
+    return Math.pow(Math.max(0, Math.min(1, v)), 1 / ADOBE_GAMMA) * 255;
+  });
+  return rgbCss(out, alpha);
+}
+
+/** 判断某个字段在当前照片下是否有真实数据（用于置灰） */
+function hasFieldData(key, meta){
+  if(!meta) return false;
+  const def = FIELD_GROUPS.flatMap(g => g.items).find(i => i.key === key);
+  if(!def) return false;
+  if(key === 'custom') return true;
+  try { return !!(def.get(meta, state.style)); } catch(e){ return false; }
+}
+
+/* ============================================================
+   2. 水印绘制
+   ============================================================ */
+
+function pickFontSize(cvsCtx, text, maxW, size, weight){
+  let s = size;
+  for(let i=0; i<10 && s > size*0.5; i++){
+    cvsCtx.font = weight + ' ' + s.toFixed(1) + 'px ' + CANVAS_FONT_STACK;
+    if(cvsCtx.measureText(text).width <= maxW) break;
+    s *= 0.93;
+  }
+  return s;
+}
+
+/**
+ * 在给定 canvas 上绘制照片 + 水印
+ * @param {CanvasRenderingContext2D} c
+ * @param {CanvasImageSource} img
+ * @param {number} W 目标宽
+ * @param {number} H 目标高
+ * @param {object} meta
+ * @param {object} cfg  {style, fields}
+ */
+/* Logo / 签名图：dataURL 解码成 Image，加载完成后自动重绘一次 */
+let logoCache = { src:'', img:null, pending:'' };
+function logoImage(src){
+  if(!src) return null;
+  if(logoCache.src === src) return logoCache.img;
+  if(logoCache.pending !== src){
+    logoCache = { src, img:null, pending:src };
+    const im = new Image();
+    im.onload = () => {
+      if(logoCache.src === src){ logoCache.img = im; logoCache.pending = ''; renderPreview(); }
+    };
+    im.onerror = () => { if(logoCache.pending === src) logoCache.pending = ''; };
+    im.src = src;
+  }
+  return null;
+}
+
+/* 画布几何：普通模板 = 照片原尺寸；白框模板 = 照片 + 白边（画布变大，照片不裁不缩） */
+function layoutFor(photoW, photoH, style){
+  const tpl = TEMPLATES[(style && style.template) || 'bar'] || TEMPLATES.bar;
+  if(!tpl.frame){
+    return { cw:photoW, ch:photoH,
+             geom:{ px:0, py:0, pw:photoW, ph:photoH, ax:0, ay:0, aw:photoW, ah:photoH } };
+  }
+  const m = Math.max(6, Math.round(Math.min(photoW, photoH) * 0.045));
+  const b = Math.round(m * 3.0);
+  return {
+    cw: photoW + m*2,
+    ch: photoH + m + b,
+    geom:{ px:m, py:m, pw:photoW, ph:photoH, ax:m, ay:photoH + m, aw:photoW, ah:b }
+  };
+}
+
+function drawComposition(c, img, L, meta, cfg){
+  const st = cfg.style, f = cfg.fields;
+  const tpl = TEMPLATES[st.template] || TEMPLATES.bar;
+  const W = L.cw, H = L.ch, g = L.geom;
+  const wide = !!cfg.wide;
+  // 宽色域工作空间下，界面选的 sRGB 颜色要先换算，否则印上去会偏色
+  const col = (hex, a) => wide ? cssColor(hex, a, true) : (a === undefined ? hex : hexToRgba(hex, a));
+
+  // 1) 底图（白框模板先铺框体，再把照片放进框内）
+  c.save();
+  c.clearRect(0, 0, W, H);
+  c.imageSmoothingEnabled = true;
+  c.imageSmoothingQuality = 'high';
+  if(tpl.frame){
+    c.fillStyle = st.bgColor;
+    c.fillRect(0, 0, W, H);
+    c.drawImage(img, g.px, g.py, g.pw, g.ph);
+  } else {
+    c.drawImage(img, 0, 0, W, H);
+  }
+  c.restore();
+
+  if(!meta) return;
+
+  // 2) 组装文本
+  const sep = SEPARATORS[st.sep] !== undefined ? SEPARATORS[st.sep] : ' · ';
+  const on = f;
+  const primary = [on.make && meta.make,
+                   on.model && ((st.readableModel && meta.modelNice) ? meta.modelNice : meta.model)]
+                  .filter(Boolean).join(' ').trim();
+  const secondary = [on.lens && meta.lens, on.lensMake && meta.lensMake].filter(Boolean)
+                      .filter((v,i,a) => a.indexOf(v) === i).join(sep).trim();
+  const params = [
+    on.focal     && meta.focal   ? fmtFocal(meta.focal) : '',
+    on.focal35   && meta.focal35 ? meta.focal35 + 'mm' : '',
+    on.aperture  && meta.fNumber ? fmtAperture(meta.fNumber) : '',
+    on.shutter   && meta.shutter ? meta.shutter : '',
+    on.iso       && meta.iso     ? 'ISO ' + meta.iso : '',
+    on.ev        && meta.ev      ? meta.ev : '',
+    on.program   && meta.program ? meta.program : '',
+    on.metering  && meta.metering? meta.metering : '',
+    on.wb        && meta.wb      ? meta.wb : ''
+  ].filter(Boolean).join(sep);
+  const extra = [
+    on.date      && meta.dateText ? meta.dateText : '',
+    on.dims      && meta.dims     ? meta.dims : '',
+    on.gps       && meta.gpsText  ? meta.gpsText : '',
+    on.software  && meta.software ? meta.software : '',
+    on.artist    && meta.artist   ? meta.artist : '',
+    on.copyright && meta.copyright? meta.copyright : '',
+    on.custom    && st.customText ? st.customText : ''
+  ].filter(Boolean).join(sep);
+
+  if(!primary && !secondary && !params && !extra) return;
+
+  // 3) 基础尺寸
+  const short = Math.min(g.pw, g.ph);
+  const base = Math.max(9, short * (st.sizeScale / 100) * (tpl.sizeMul || 1));
+  const padScale = (st.padScale === undefined) ? 1 : st.padScale;
+  const pad = base * tpl.padMul * 1.15 * padScale;
+  const lh = (st.lineGap === undefined) ? 1.34 : st.lineGap;
+  const textCol = col(st.textColor);
+  const dimCol = col(st.textColor, .76);
+  const accCol = col(st.accentColor);
+  const weightTitle = st.boldTitle ? 700 : 500;
+
+  // 4) 构造行
+  const rows = [];
+  if(tpl.twoCol){
+    if(primary || secondary) rows.push({kind:'two'});
+    if(params) rows.push({kind:'one', text:params, size:base*0.58, weight:500, color:dimCol});
+    if(extra)  rows.push({kind:'one', text:extra,  size:base*0.5,  weight:450, color:col(st.textColor,.58)});
+  } else {
+    if(primary)   rows.push({kind:'one', text:primary,   size:base,        weight:weightTitle, color:textCol});
+    if(secondary) rows.push({kind:'one', text:secondary, size:base*0.62,   weight:500,         color:dimCol});
+    if(params)    rows.push({kind:'one', text:params,    size:base*0.6,    weight:500,         color:tpl.shadow?col(st.textColor,.86):dimCol});
+    if(extra)     rows.push({kind:'one', text:extra,     size:base*0.52,   weight:450,         color:col(st.textColor,.6)});
+  }
+  // 署名：独立一行，斜体 + 强调色，左右对齐可选
+  if(st.sigText && String(st.sigText).trim()){
+    rows.push({kind:'one', text:st.sigText, size:base*0.56, weight:500,
+               color:accCol, italic:true, align: st.sigAlign || 'right'});
+  }
+  // Logo / 签名图（可选）
+  const logoImg = cfg.logo;
+  let logoBox = null;
+  if(logoImg && logoImg.naturalWidth){
+    const lhL = base * ((st.logoScale === undefined) ? 1.15 : st.logoScale);
+    logoBox = { w: Math.max(6, lhL * (logoImg.naturalWidth / logoImg.naturalHeight)), h: lhL };
+  }
+  const logoPos = st.logoPos || 'left';
+  const logoGap = base * 0.62;
+  if(!rows.length && !logoBox) return;
+
+  // 5) 可用区域与块宽估算
+  const sarea = tpl.frame
+    ? { x:g.ax, y:g.ay, w:g.aw, h:g.ah }      // 白框模板：文字写在下方白边里
+    : { x:0, y:0, w:W, h:H };
+  const logoInline = (logoBox && logoPos !== 'top') ? logoBox.w + logoGap : 0;
+  const blockMax = (tpl.bled || tpl.frame) ? sarea.w : sarea.w * 0.92;
+  const innerMax = Math.max(40, blockMax - pad*2 - logoInline);
+
+  // 块内顶部预留：齿孔 / 细线 / 票根虚线占的位置
+  let topExtra = 0;
+  if(tpl.perfor)   topExtra = base * 0.95;
+  if(tpl.hairline) topExtra = base * 0.95;
+  if(tpl.notch)    topExtra = base * 0.85;
+
+  // 逐行测量（先给临时字号，后续微调）
+  let contentW = 0;
+  rows.forEach(r => {
+    if(r.kind === 'two'){
+      r.left  = { text:primary,   size:base,       weight:weightTitle, color:textCol };
+      r.right = { text:secondary, size:base*0.56,  weight:500,         color:dimCol };
+      c.font = r.left.weight + ' ' + r.left.size + 'px ' + CANVAS_FONT_STACK;
+      const wl = c.measureText(primary).width;
+      c.font = r.right.weight + ' ' + r.right.size + 'px ' + CANVAS_FONT_STACK;
+      const wr = secondary ? c.measureText(secondary).width : 0;
+      r._wl = wl; r._wr = wr;
+      r._h = Math.max(r.left.size, r.right.size) * lh;
+      contentW = Math.max(contentW, Math.min(wl + wr + base*1.2, innerMax));
+    } else {
+      const w = measure(c, r.text, r.size, r.weight);
+      r._h = r.size * lh;
+      contentW = Math.max(contentW, Math.min(w, innerMax));
+    }
+  });
+
+  // 若内容过宽，整体等比缩一号
+  const naturalW = contentW;
+  let fontScale = 1;
+  if(naturalW > innerMax && naturalW > 0){
+    fontScale = Math.max(0.55, innerMax / naturalW);
+  }
+  if(fontScale < 1){
+    rows.forEach(r => {
+      if(r.kind === 'two'){
+        r.left.size *= fontScale; r.right.size *= fontScale;
+        r._wl *= fontScale; r._wr *= fontScale; r._h *= fontScale;
+      } else {
+        r.size *= fontScale; r._h *= fontScale;
+      }
+    });
+    contentW *= fontScale;
+  }
+
+  let blockW = Math.min(blockMax, Math.max(contentW + pad*2 + logoInline, base*4));
+  if(tpl.bled || tpl.frame) blockW = sarea.w;
+  const rowsH = rows.reduce((s,r) => s + r._h, 0);
+  let blockH = rowsH + pad*2 + topExtra;
+  if(logoBox && logoPos === 'top') blockH += logoBox.h + logoGap*0.85;
+  if(logoBox && logoPos !== 'top') blockH = Math.max(blockH, logoBox.h + pad*2 + topExtra);
+
+  // 6) 定位（相对「可用区域」，白框模板即下方白边）
+  const [vpos, hpos] = ANCHORS[st.anchor] || ANCHORS['bottom'];
+  const mScale = (st.marginMul === undefined) ? 1 : st.marginMul;
+  const margin = (tpl.bled || tpl.frame) ? 0 : base * 1.5 * mScale;
+  let bx, by;
+  if(tpl.bled || tpl.frame){
+    bx = sarea.x;
+  } else if(hpos === 'left')   bx = sarea.x + margin;
+  else if(hpos === 'right')    bx = sarea.x + sarea.w - blockW - margin;
+  else                         bx = sarea.x + (sarea.w - blockW) / 2;
+  if(tpl.frame)                by = sarea.y + (sarea.h - blockH) / 2;
+  else if(vpos === 'top')      by = sarea.y + margin;
+  else if(vpos === 'bottom')   by = sarea.y + sarea.h - blockH - margin;
+  else                         by = sarea.y + (sarea.h - blockH) / 2;
+  bx += (st.offsetX/100) * sarea.w;
+  by += (st.offsetY/100) * sarea.h;
+
+  // 7) 底衬与装饰
+  const effectiveBg = tpl.bg ? Math.min(1, (st.bgOpacity/100)) : 0;
+  const radius = (tpl.radius > 0) ? Math.max(0, st.radius) : 0;
+  c.save();
+  if(effectiveBg > 0.002){
+    c.fillStyle = col(st.bgColor, effectiveBg);
+    if(radius > 0){ roundRect(c, bx, by, blockW, blockH, radius); c.fill(); }
+    else          { c.fillRect(bx, by, blockW, blockH); }
+  }
+  // 玻璃卡片：细描边
+  if(tpl.border){
+    const lwB = Math.max(1, base*0.045);
+    c.strokeStyle = col(st.textColor, .22);
+    c.lineWidth = lwB;
+    roundRect(c, bx + lwB/2, by + lwB/2, blockW - lwB, blockH - lwB, Math.max(0, radius - lwB/2));
+    c.stroke();
+  }
+  // 通栏顶部强调条
+  if(tpl.accent === 'barTop'){
+    c.fillStyle = accCol;
+    c.fillRect(bx, by, blockW, Math.max(1.5, base*0.055));
+  }
+  // 居中铭牌的分隔线
+  if(tpl.rule){
+    const rw0 = blockW * 0.34;
+    c.fillStyle = accCol;
+    c.fillRect(bx + (blockW - rw0)/2, by + pad*0.35, rw0, Math.max(1.2, base*0.05));
+  }
+  // 细线极简：文字上方一条短线
+  if(tpl.hairline){
+    const lwH = Math.max(18, Math.min(blockW - pad*2, base*9));
+    c.fillStyle = accCol;
+    c.fillRect(bx + pad, by + pad*0.42, lwH, Math.max(1.2, base*0.05));
+  }
+  // 胶片齿孔
+  if(tpl.perfor){
+    const hw = Math.max(2.5, base*0.17), hh = Math.max(3, base*0.34), step = hw*2.6;
+    c.fillStyle = col(st.textColor, .26);
+    for(let x = bx + pad*0.55; x + hw < bx + blockW - pad*0.35; x += step){
+      roundRect(c, x, by + pad*0.5, hw, hh, hw*0.3);
+      c.fill();
+    }
+  }
+  c.restore();
+
+  // 票根：虚线 + 两侧缺口（把底图裁一块画回来，形成真正的「挖空」）
+  if(tpl.notch){
+    const ny = by + pad + topExtra*0.5;
+    const nr = Math.max(3, base*0.42);
+    c.save();
+    c.strokeStyle = col(st.textColor, .34);
+    c.lineWidth = Math.max(1, base*0.035);
+    if(c.setLineDash) c.setLineDash([Math.max(3, base*0.22), Math.max(3, base*0.18)]);
+    c.beginPath();
+    c.moveTo(bx + nr*1.35, ny);
+    c.lineTo(bx + blockW - nr*1.35, ny);
+    c.stroke();
+    if(c.setLineDash) c.setLineDash([]);
+    [bx, bx + blockW].forEach(cxN => {
+      c.save();
+      c.beginPath(); c.arc(cxN, ny, nr, 0, Math.PI*2); c.clip();
+      if(tpl.frame){ c.fillStyle = st.bgColor; c.fillRect(cxN-nr, ny-nr, nr*2, nr*2); }
+      else { c.drawImage(img, 0, 0, W, H); }
+      c.restore();
+    });
+    c.restore();
+  }
+
+  // 8) 文字与 Logo
+  const align = tpl.align;
+  let textL = bx + pad, textR = bx + blockW - pad;
+  let cursorY = by + pad + topExtra;
+  if(logoBox && logoPos === 'top')        cursorY += logoBox.h + logoGap*0.85;
+  else if(logoBox && logoPos === 'left')  textL += logoBox.w + logoGap;
+  else if(logoBox && logoPos === 'right') textR -= logoBox.w + logoGap;
+
+  c.save();
+  c.textBaseline = 'middle';
+  if(tpl.shadow){
+    c.shadowColor = 'rgba(0,0,0,.78)';
+    c.shadowBlur = Math.max(4, base * 0.32);
+    c.shadowOffsetY = Math.max(1, base * 0.03);
+  }
+  rows.forEach(r => {
+    const cy = cursorY + r._h/2;
+    if(r.kind === 'two'){
+      const avail = Math.max(40, textR - textL - base*0.9);
+      // 左：主标题
+      c.font = r.left.weight + ' ' + r.left.size + 'px ' + CANVAS_FONT_STACK;
+      const rightBox = r.right.text ? Math.min(r._wr, avail*0.46) : 0;
+      const leftMax = avail - rightBox - (rightBox ? base*0.6 : 0);
+      const ls = pickFontSize(c, r.left.text, leftMax, r.left.size, r.left.weight);
+      c.font = r.left.weight + ' ' + ls + 'px ' + CANVAS_FONT_STACK;
+      c.fillStyle = r.left.color;
+      c.textAlign = 'left';
+      c.fillText(r.left.text, textL, cy);
+      // 右侧参数
+      if(r.right.text){
+        const rs = pickFontSize(c, r.right.text, avail*0.46, r.right.size, r.right.weight);
+        c.font = r.right.weight + ' ' + rs + 'px ' + CANVAS_FONT_STACK;
+        c.fillStyle = r.right.color;
+        c.textAlign = 'right';
+        c.fillText(r.right.text, textR, cy + (r.left.size - r.right.size) * 0.12);
+      }
+    } else {
+      const maxW = Math.max(40, textR - textL);
+      const s = pickFontSize(c, r.text, maxW, r.size, r.weight);
+      c.font = (r.italic ? 'italic ' : '') + r.weight + ' ' + s + 'px ' + CANVAS_FONT_STACK;
+      c.fillStyle = r.color;
+      const a = r.align || align;
+      c.textAlign = (a === 'center') ? 'center' : (a === 'right' ? 'right' : 'left');
+      const tx = (a === 'center') ? (textL + (textR - textL)/2) : (a === 'right' ? textR : textL);
+      c.fillText(r.text, tx, cy);
+    }
+    cursorY += r._h;
+  });
+  c.restore();
+
+  // Logo / 签名图
+  if(logoBox && logoImg){
+    c.save();
+    c.globalAlpha = ((st.logoOpacity === undefined) ? 100 : st.logoOpacity) / 100;
+    let lx;
+    if(logoPos === 'left')        lx = bx + pad;
+    else if(logoPos === 'right')  lx = bx + blockW - pad - logoBox.w;
+    else if(align === 'center')   lx = bx + blockW/2 - logoBox.w/2;
+    else if(align === 'right')    lx = bx + blockW - pad - logoBox.w;
+    else                          lx = bx + pad;
+    const ly = (logoPos === 'top') ? (by + pad + topExtra) : (by + blockH/2 - logoBox.h/2);
+    c.drawImage(logoImg, lx, ly, logoBox.w, logoBox.h);
+    c.restore();
+  }
+}
+
+function measure(c, text, size, weight){
+  c.font = weight + ' ' + size + 'px ' + CANVAS_FONT_STACK;
+  return c.measureText(text).width;
+}
+function roundRect(c, x, y, w, h, r){
+  const rr = Math.max(0, Math.min(r, Math.min(w, h)/2));
+  c.beginPath();
+  c.moveTo(x + rr, y);
+  c.lineTo(x + w - rr, y);
+  c.quadraticCurveTo(x + w, y, x + w, y + rr);
+  c.lineTo(x + w, y + h - rr);
+  c.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+  c.lineTo(x + rr, y + h);
+  c.quadraticCurveTo(x, y + h, x, y + h - rr);
+  c.lineTo(x, y + rr);
+  c.quadraticCurveTo(x, y, x + rr, y);
+  c.closePath();
+}
+function hexToRgba(hex, a){
+  let h = String(hex || '#000').replace('#','');
+  if(h.length === 3) h = h.split('').map(x => x+x).join('');
+  const n = parseInt(h, 16);
+  if(isNaN(n)) return 'rgba(0,0,0,' + a + ')';
+  return 'rgba(' + ((n>>16)&255) + ',' + ((n>>8)&255) + ',' + (n&255) + ',' + a + ')';
+}
+
+/* ============================================================
+   3. 图片载入
+   ============================================================ */
+
+let uid = 0;
+
+/** RAW / TIFF / 相机原始格式：浏览器多半直接解不了，需要走内嵌预览兜底 */
+const RAW_EXT = /\.(arw|srf|sr2|dng|cr2|cr3|crw|nef|nrw|orf|raf|rw2|pef|srw|tif|tiff|3fr|fff|iiq|x3f)$/i;
+const HEIC_EXT = /\.(heic|heif|hif)$/i;
+
+function looksUnsupportedByName(name, type){
+  return RAW_EXT.test(name || '') || HEIC_EXT.test(name || '') ||
+         /tiff|arw|dng|raw|x-canon-cr|x-nikon/i.test(type || '');
+}
+
+function decodeImage(blob, urls){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => { urls.push(url); res(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('decode failed')); };
+    img.src = url;
+  });
+}
+
+async function loadFiles(fileList){
+  const files = Array.from(fileList).filter(f =>
+    /^image\//.test(f.type) || /\.(jpe?g|png|webp|arw|srf|sr2|dng|cr2|cr3|nef|nrw|orf|raf|rw2|pef|srw|tiff?|heic|heif)$/i.test(f.name));
+  if(!files.length){ toast('没找到可识别的图片文件', 'err'); return; }
+
+  setBusy(true, '正在读取 ' + files.length + ' 张照片…');
+  let okCount = 0, failCount = 0, rawOnly = 0;
+
+  for(const file of files){
+    try{
+      const item = await loadOne(file);
+      state.items.push(item);
+      okCount++;
+      if(item.previewOnly) rawOnly++;
+    }catch(err){
+      console.warn('载入失败', file.name, err);
+      if(String(err.message).indexOf('RAW') === 0 || looksUnsupportedByName(file.name, file.type)) rawOnly++;
+      failCount++;
+    }
+  }
+
+  renderThumbs();
+  if(state.active < 0 && state.items.length) state.active = 0;
+  setActive(state.active, true);
+  updateExportEstimate();
+  setBusy(false);
+
+  if(okCount && !failCount){
+    toast(rawOnly ? '已载入 ' + rawOnly + ' 张 RAW（用的是内嵌预览图）' : '已载入 ' + okCount + ' 张', rawOnly ? '' : 'ok');
+  }
+  else if(okCount && failCount) toast('载入 ' + okCount + ' 张，' + failCount + ' 张失败', '');
+  else if(rawOnly) toast('这些是 RAW / TIFF / HEIC，浏览器无法直接渲染。请先用 OM Workspace / Lightroom 导出 JPEG 或 TIFF 再拖进来', 'err');
+  else toast(IS_IOS
+    ? '这些照片读不出来。iPhone「高效」模式的 HEIC 可能不被浏览器支持——到 设置 › 相机 › 格式 选「兼容性最佳」，或先把照片转成 JPEG 再试'
+    : '这些文件读不出来（HEIC / RAW 请先转成 JPEG）', 'err');
+}
+
+async function loadOne(file){
+  const urls = [];
+  let buf = null, tiff = null, raw = {}, exifError = null;
+  try{
+    buf = await file.arrayBuffer();
+    tiff = locateTiff(buf);
+    if(tiff) raw = parseTiff(tiff);
+  }catch(e){ exifError = e; }
+
+  /* 1) 常规解码；失败再看是不是 RAW/TIFF，尝试内嵌 JPEG 预览 */
+  let img = null, srcUrl = '', previewOnly = false, rawSize = null;
+  try{
+    img = await decodeImage(file, urls);
+    srcUrl = urls[urls.length - 1];
+  }catch(e){
+    const pv = extractEmbeddedJpeg(tiff, raw);
+    if(pv){
+      try{
+        img = await decodeImage(new Blob([pv.bytes], { type: 'image/jpeg' }), urls);
+        srcUrl = urls[urls.length - 1];
+        previewOnly = true;
+        rawSize = raw && raw._SubW ? { w: raw._SubW, h: raw._SubH } : null;
+      }catch(e2){ img = null; }
+    }
+    if(!img) throw new Error(looksUnsupportedByName(file.name, file.type) ? 'RAW_UNSUPPORTED' : 'UNSUPPORTED');
+  }
+
+  const W = img.naturalWidth || img.width;
+  const H = img.naturalHeight || img.height;
+
+  /* 2) 色彩配置：原图带的是什么 ICC，以及能不能「按原样」解码 */
+  let icc = null, iccDesc = '', wide = false;
+  if(buf && !previewOnly){
+    try{ icc = await locateIcc(buf); }catch(e){}
+    if(icc && icc.length > 128){
+      iccDesc = iccDescription(icc);
+      const suspect = iccDesc ? WIDE_RE.test(iccDesc) : true;
+      if(suspect){
+        const diff = await probeDecodeNoConvert(file);
+        wide = diff > 3;
+        if(!wide) icc = null;     // 浏览器不支持不转换解码 → 老老实实按 sRGB 走
+      } else {
+        icc = null;               // 本来就是 sRGB，没必要折腾
+      }
+    } else {
+      icc = null;
+    }
+  }
+
+  const meta = buildMeta(raw, W, H);
+  meta.sourceWidth = previewOnly && rawSize ? rawSize.w : W;
+  meta.sourceHeight = previewOnly && rawSize ? rawSize.h : H;
+
+  // 缩略图
+  const tscale = Math.min(1, THUMB_MAX / Math.max(W, H));
+  const tc = document.createElement('canvas');
+  tc.width = Math.max(1, Math.round(W * tscale));
+  tc.height = Math.max(1, Math.round(H * tscale));
+  tc.getContext('2d').drawImage(img, 0, 0, tc.width, tc.height);
+
+  return {
+    id: ++uid, name: file.name, file, img, url: srcUrl,
+    meta, width: W, height: H,
+    thumb: tc.toDataURL('image/jpeg', .72),
+    tcanvas: tc,
+    icc, iccDesc, wide, previewOnly, rawSize, exifError
+  };
+}
+
+/* ============================================================
+   4. 预览渲染
+   ============================================================ */
+
+function current(){ return state.items[state.active] || null; }
+
+function renderPreview(){
+  const it = current();
+  if(!it) return;
+  const st = ST();
+  const tscale = Math.min(1, PREVIEW_MAX / Math.max(it.width, it.height));
+  const pw = Math.max(1, Math.round(it.width * tscale));
+  const ph = Math.max(1, Math.round(it.height * tscale));
+  const L = layoutFor(pw, ph, st);
+  const w = L.cw, h = L.ch;
+  if(dom.canvas.width !== w || dom.canvas.height !== h){
+    dom.canvas.width = w;
+    dom.canvas.height = h;
+  }
+  state.previewScale = tscale;
+  dom.canvas.style.aspectRatio = w + ' / ' + h;
+
+  // 预览始终按「浏览器显示结果」来画：宽色域导出只是数值不同，肉眼看与预览一致。
+  drawComposition(ctx, it.img, L, it.meta, { style: st, fields: state.fields, logo: logoImage(st.logo) });
+
+  // 状态栏
+  const mm = it.meta;
+  const bits = [];
+  bits.push('<b>' + esc(it.name) + '</b>');
+  if(it.previewOnly){
+    bits.push('<span style="color:var(--accent)">RAW 内嵌预览 ' + it.width + '×' + it.height +
+              ' · 正式出图请先导出 JPEG</span>');
+  } else {
+    bits.push(it.width + '×' + it.height);
+  }
+  const niceName = (st.readableModel && mm.modelNice) ? mm.modelNice : mm.model;
+  if(mm.make || niceName) bits.push(esc([mm.make, niceName].filter(Boolean).join(' ')));
+  if(mm.lens) bits.push(esc(mm.lens));
+  const pe = [fmtFocal(mm.focal), fmtAperture(mm.fNumber), mm.shutter, mm.iso ? 'ISO '+mm.iso : ''].filter(Boolean).join(' ');
+  if(pe) bits.push(esc(pe));
+  if(it.iccDesc && it.wide) bits.push('<span style="color:var(--accent)">' + esc(it.iccDesc) + '</span>');
+  dom.stageMeta.innerHTML = bits.join(' &nbsp;·&nbsp; ');
+}
+
+/* 高频交互（拖滑块 / 取色器）用 rAF 节流，避免每个事件都重绘整张大画布 */
+let rafPending = false;
+function scheduleRender(){
+  if(rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(() => { rafPending = false; renderPreview(); });
+}
+
+function renderExifTable(){
+  const it = current();
+  if(!it){ dom.exifBox.hidden = true; return; }
+  dom.exifBox.hidden = false;
+  const raw = it.meta.raw || {};
+  const keys = Object.keys(raw).filter(k => !k.startsWith('_'));
+  if(!keys.length){
+    dom.exifBody.innerHTML = '<div class="exif-empty">这张照片里没有读到 EXIF（可能是截图、被导出软件抹掉了元数据，或是 PNG 里没写 eXIf）。水印会根据你手动勾选的字段显示已有内容。</div>';
+    return;
+  }
+  const rows = keys.map(k => {
+    let v = raw[k];
+    if(k === 'UserComment' || k === 'MakerNote') v = String(v).slice(0, 40);
+    if(Array.isArray(v)) v = v.join(', ');
+    if(typeof v === 'number') v = String(round1(v));
+    if(String(v) === '[object Object]') v = '—';
+    return '<tr><th>' + esc(k) + '</th><td>' + esc(String(v)) + '</td></tr>';
+  }).join('');
+  dom.exifBody.innerHTML = '<table class="exif-table">' + rows + '</table>';
+}
+
+/* ============================================================
+   5. 导出
+   ============================================================ */
+
+function targetSize(it, maxOverride){
+  const max = (maxOverride !== undefined) ? maxOverride : state.exp.maxSize;
+  if(!max) return { w: it.width, h: it.height };
+  const s = Math.min(1, max / Math.max(it.width, it.height));
+  return { w: Math.max(1, Math.round(it.width*s)), h: Math.max(1, Math.round(it.height*s)) };
+}
+
+function resolveFormat(it){
+  const f = state.exp.format;
+  if(f === 'jpeg') return 'jpeg';
+  if(f === 'png') return 'png';
+  const n = (it.file.name || '').toLowerCase();
+  if(/\.png$/.test(n)) return 'png';
+  if(/\.webp$/.test(n)) return 'webp';
+  return 'jpeg';
+}
+
+async function renderToBlob(it, maxOverride){
+  const st = ST();
+  const photo = targetSize(it, maxOverride);
+  // 白框模板画布会更大（多出白边），上限检查按最终画布尺寸算
+  const L = layoutFor(photo.w, photo.h, st);
+  const w = L.cw, h = L.ch;
+  // 超出本设备画布上限时给明确指引，而不是白屏或静默失败
+  if(w * h > CANVAS_LIMIT){
+    const mp = (w * h / 1e6).toFixed(1);
+    throw new Error('CANVAS_TOO_BIG:' + w + '×' + h + '（' + mp + ' 百万像素）超出' +
+                    (IS_MOBILE ? '这台手机的浏览器' : '浏览器') + '能处理的上限');
+  }
+  let c;
+  try{
+    c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    if(!c.getContext("2d")) throw new Error("no-context");
+  }catch(e){
+    throw new Error("CANVAS_OOM:" + w + "×" + h + " 画布分配失败（" +
+                    (IS_MOBILE ? "手机可用内存不足" : "内存不足") + "）");
+  }
+  const cc = c.getContext("2d");
+  const fmt = resolveFormat(it);
+
+  /* 宽色域保真：用「不做色彩转换」的方式解码，画布里的数值就是原图数值，
+     导出时再把原 ICC 原样贴回去 —— AdobeRGB 原片不会被压成 sRGB。 */
+  const wantWide = !!state.exp.keepColor && !!it.wide && !!it.icc && fmt !== 'webp';
+  let src = it.img, rawBmp = null;
+  if(wantWide){
+    try{
+      if(!it._rawBmp) it._rawBmp = await createImageBitmap(it.file, { colorSpaceConversion: 'none' });
+      rawBmp = it._rawBmp;
+      src = rawBmp;
+    }catch(e){ rawBmp = null; }
+  }
+  const wide = !!rawBmp;
+
+  try{
+    drawComposition(cc, src, L, it.meta, { style: st, fields: state.fields, wide, logo: logoImage(st.logo) });
+  }catch(e){
+    if(rawBmp && rawBmp.close) rawBmp.close();
+    it._rawBmp = null;
+    throw new Error("CANVAS_OOM:绘制阶段内存不足（" + w + "×" + h + "）");
+  }
+
+  const mime = fmt === "png" ? "image/png" : (fmt === "webp" ? "image/webp" : "image/jpeg");
+  const q = fmt === "png" ? undefined : state.exp.quality;
+
+  let blob = await new Promise(res => c.toBlob(res, mime, q));
+
+  // 位图用完就放，50MP 的位图一张就是 200MB
+  if(rawBmp && rawBmp.close) rawBmp.close();
+  it._rawBmp = null;
+
+  if(!blob) throw new Error("CANVAS_OOM:编码失败（" + w + "×" + h + "），" +
+                            (IS_MOBILE ? "手机" : "浏览器") + "内存不够");
+
+  try{
+    if(fmt === 'jpeg')      blob = await attachJpegMeta(blob, it, { w, h, wide });
+    else if(fmt === 'png')  blob = await attachPngMeta(blob, it, { wide });
+  }catch(e){ console.warn('元数据回写失败', e); }
+
+  return { blob, fmt, w, h, wide };
+}
+
+function outName(it, fmt){
+  const base = (it.name || 'photo').replace(/\.[^.]+$/, '');
+  const ext = fmt === 'png' ? 'png' : (fmt === 'webp' ? 'webp' : 'jpg');
+  const suf = state.exp.suffix || '';
+  return base + suf + '.' + ext;
+}
+
+function download(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+function cleanErr(e){
+  return String((e && e.message) || e).replace(/^CANVAS_(TOO_BIG|OOM):/, "");
+}
+
+/**
+ * 导出一张。
+ * 手机浏览器的画布内存有限，原尺寸可能装不下 —— 这时自动降到长边 2560
+ * 重试一次，并把"降级了"这件事明确告诉用户，而不是直接报错摆烂。
+ */
+async function exportOne(it){
+  try{
+    const r = await renderToBlob(it);
+    download(r.blob, outName(it, r.fmt));
+    return { size: r.blob.size, name: outName(it, r.fmt), degraded: false };
+  }catch(err){
+    const msg = String(err.message || "");
+    const isCapacity = msg.indexOf("CANVAS_TOO_BIG:") === 0 || msg.indexOf("CANVAS_OOM:") === 0;
+    const full = targetSize(it);
+    if(isCapacity && Math.max(full.w, full.h) > FALLBACK_LONG_EDGE){
+      const r = await renderToBlob(it, FALLBACK_LONG_EDGE);
+      download(r.blob, outName(it, r.fmt));
+      return {
+        size: r.blob.size, name: outName(it, r.fmt), degraded: true,
+        from: full.w + "×" + full.h, to: r.w + "×" + r.h
+      };
+    }
+    throw err;
+  }
+}
+
+let mobileSaveTipShown = false;
+function maybeMobileTip(){
+  if(!IS_MOBILE || mobileSaveTipShown) return;
+  mobileSaveTipShown = true;
+  setTimeout(() => toast(IS_IOS
+    ? "手机上保存：文件会进「文件」App › 下载，之后从相册或文件里就能分享"
+    : "手机上保存：文件会进「下载」或通知栏，可在相册/文件管理器里找到", ""), 1400);
+}
+
+async function exportActive(){
+  const it = current();
+  if(!it) return;
+  setBusy(true, "正在导出…");
+  try{
+    const r = await exportOne(it);
+    if(r.degraded) toast("原尺寸 " + r.from + " 超出本机浏览器画布上限，已自动按 " + r.to + " 导出（" + fmtSize(r.size) + "）", "");
+    else toast("已导出 " + r.name + "（" + fmtSize(r.size) + "）", "ok");
+    maybeMobileTip();
+  }catch(e){
+    console.error(e);
+    toast("导出失败：" + cleanErr(e), "err");
+  }
+  setBusy(false);
+}
+
+async function exportAll(){
+  if(!state.items.length || state.busy) return;
+  setBusy(true, "正在导出 " + state.items.length + " 张…");
+  let done = 0, totalBytes = 0, failed = 0, degraded = 0;
+  for(const it of state.items){
+    try{
+      const r = await exportOne(it);
+      totalBytes += r.size; done++;
+      if(r.degraded) degraded++;
+      updateProgress(done + "/" + state.items.length);
+    }catch(e){
+      console.warn("导出失败", it.name, e);
+      failed++;
+    }
+    await sleep(320); // 避免浏览器拦截连续下载
+  }
+  setBusy(false);
+  let msg = "全部导出完成，共 " + done + " 张 / " + fmtSize(totalBytes);
+  if(degraded) msg += "；其中 " + degraded + " 张因超出画布上限自动缩到长边 " + FALLBACK_LONG_EDGE;
+  if(failed) msg += "；" + failed + " 张失败";
+  toast(msg + (failed ? "" : "。若浏览器提示「允许多文件下载」请点允许"), failed ? "" : "ok");
+  maybeMobileTip();
+}
+
+/* -------- 元数据回写：EXIF / XMP / IPTC / ICC -------- */
+
+function exifCtx(seg){
+  const tiff = 10;
+  if(seg.length < tiff + 8) return null;
+  const le = seg[tiff] === 0x49 && seg[tiff+1] === 0x49;
+  const be = seg[tiff] === 0x4D && seg[tiff+1] === 0x4D;
+  if(!le && !be) return null;
+  const rd16 = o => le ? (seg[o] | (seg[o+1]<<8)) : ((seg[o]<<8) | seg[o+1]);
+  const rd32 = o => le
+    ? (seg[o] | (seg[o+1]<<8) | (seg[o+2]<<16) | (seg[o+3]<<24)) >>> 0
+    : ((seg[o]<<24) | (seg[o+1]<<16) | (seg[o+2]<<8) | seg[o+3]) >>> 0;
+  return { tiff, le, rd16, rd32 };
+}
+function findEntry(seg, ctx, ifdOff, tag){
+  if(ifdOff <= 0 || ifdOff + 2 > seg.length) return -1;
+  const n = ctx.rd16(ifdOff);
+  if(n > 512) return -1;
+  for(let i=0;i<n;i++){
+    const e = ifdOff + 2 + i*12;
+    if(e + 12 > seg.length) return -1;
+    if(ctx.rd16(e) === tag) return e;
+  }
+  return -1;
+}
+function writeShort(seg, ctx, e, v){
+  if(ctx.le){ seg[e+8] = v & 0xFF; seg[e+9] = (v >> 8) & 0xFF; }
+  else      { seg[e+8] = (v >> 8) & 0xFF; seg[e+9] = v & 0xFF; }
+}
+function writeLong(seg, ctx, e, v){
+  if(ctx.le){
+    seg[e+8] = v & 0xFF; seg[e+9] = (v>>8) & 0xFF; seg[e+10] = (v>>16) & 0xFF; seg[e+11] = (v>>24) & 0xFF;
+  } else {
+    seg[e+8] = (v>>24) & 0xFF; seg[e+9] = (v>>16) & 0xFF; seg[e+10] = (v>>8) & 0xFF; seg[e+11] = v & 0xFF;
+  }
+}
+
+/**
+ * 修 APP1：方向标记归 1（避免二次旋转）、尺寸改成实际导出尺寸、
+ * ColorSpace 改成和真实数据一致（宽色域 65535 / sRGB 1）。
+ */
+function patchExifSegment(seg, w, h, wide){
+  const ctx = exifCtx(seg);
+  if(!ctx) return;
+  const ifd0 = ctx.tiff + ctx.rd32(ctx.tiff + 4);
+  const oe = findEntry(seg, ctx, ifd0, 0x0112);
+  if(oe > 0) writeShort(seg, ctx, oe, 1);
+
+  const pe = findEntry(seg, ctx, ifd0, 0x8769);
+  if(pe <= 0) return;
+  // 注意：IFD 里的偏移是相对 TIFF 头（段内第 10 字节）算的，要加回基址
+  const exifIfd = ctx.tiff + ctx.rd32(pe + 8);
+  const ce = findEntry(seg, ctx, exifIfd, 0xA001);
+  if(ce > 0) writeShort(seg, ctx, ce, wide ? 0xFFFF : 1);
+  const xe = findEntry(seg, ctx, exifIfd, 0xA002);
+  if(xe > 0 && w) writeLong(seg, ctx, xe, w);
+  const ye = findEntry(seg, ctx, exifIfd, 0xA003);
+  if(ye > 0 && h) writeLong(seg, ctx, ye, h);
+}
+
+/** 修 XMP：方向、尺寸、色域标记同步，其余内容原样保留（星标 / 关键词 / 版权 / 修图参数） */
+function patchXmpSegment(seg, w, h){
+  const buf = new Uint8Array(seg);
+  let s = '';
+  for(let i=0;i<buf.length;i++) s += String.fromCharCode(buf[i]);
+  const s2 = s
+    .replace(/(tiff:Orientation\s*=\s*")[^"]*(")/g, '$11$2')
+    .replace(/(exif:PixelXDimension\s*=\s*")[^"]*(")/g, '$1' + w + '$2')
+    .replace(/(exif:PixelYDimension\s*=\s*")[^"]*(")/g, '$1' + h + '$2');
+  if(s2 === s) return buf;
+  const out = new Uint8Array(s2.length);
+  for(let i=0;i<s2.length;i++) out[i] = s2.charCodeAt(i) & 0xFF;
+  const len = out.length - 2;               // 段长度字段 = 载荷 + 2
+  out[2] = (len >> 8) & 0xFF; out[3] = len & 0xFF;
+  return out;
+}
+
+/** 把原图的 EXIF / XMP / IPTC / ICC 写进导出的 JPEG */
+async function attachJpegMeta(blob, it, opt){
+  const jpeg = new Uint8Array(await blob.arrayBuffer());
+  const inserts = [];
+
+  if(state.exp.keepExif && !it.previewOnly){
+    let orig = null;
+    try{ orig = new Uint8Array(await it.file.arrayBuffer()); }catch(e){}
+    if(orig){
+      const exifSeg = findApp1(orig, 'Exif\x00\x00') || findApp1(orig, 'II*');
+      if(exifSeg && exifSeg.length > 12){
+        patchExifSegment(exifSeg, opt.w, opt.h, opt.wide);
+        inserts.push(exifSeg);
+      }
+      const xmpSeg = findApp1(orig, 'http://ns.adobe.com/xap/1.0/');
+      if(xmpSeg) inserts.push(patchXmpSegment(xmpSeg, opt.w, opt.h));
+      const iptc = findApp13(orig);
+      if(iptc) inserts.push(iptc);
+    }
+  }
+  if(opt.wide && it.icc) iccToApp2(it.icc).forEach(s => inserts.push(s));
+
+  if(!inserts.length) return blob;
+  return new Blob([rebuildJpeg(jpeg, inserts, opt.wide && !!it.icc)], { type: 'image/jpeg' });
+}
+
+/** 把原图的 ICC 写进导出的 PNG */
+async function attachPngMeta(blob, it, opt){
+  if(!(opt.wide && it.icc)) return blob;
+  const png = new Uint8Array(await blob.arrayBuffer());
+  const out = await rewritePngIcc(png, it.icc);
+  return new Blob([out], { type: 'image/png' });
+}
+
+/* ============================================================
+   6. UI 构建与事件
+   ============================================================ */
+
+function buildFieldUI(){
+  dom.fieldGroups.innerHTML = '';
+  FIELD_GROUPS.forEach(g => {
+    const wrap = document.createElement('div');
+    wrap.className = 'group';
+    wrap.style.gap = '8px';
+    const t = document.createElement('div');
+    t.className = 'group-title';
+    t.textContent = g.title;
+    wrap.appendChild(t);
+    const grid = document.createElement('div');
+    grid.className = 'field-grid';
+    g.items.forEach(item => {
+      const lab = document.createElement('label');
+      lab.className = 'check';
+      lab.dataset.key = item.key;
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!state.fields[item.key];
+      cb.addEventListener('change', () => {
+        state.fields[item.key] = cb.checked;
+        saveSettings(); renderPreview();
+      });
+      const sp = document.createElement('span');
+      sp.textContent = item.label;
+      lab.appendChild(cb); lab.appendChild(sp);
+      grid.appendChild(lab);
+    });
+    wrap.appendChild(grid);
+    dom.fieldGroups.appendChild(wrap);
+  });
+  refreshFieldAvailability();
+}
+
+/** 没有数据的字段置灰 + 标注，方便用户一眼看出哪些能显示 */
+function refreshFieldAvailability(){
+  const it = current();
+  const meta = it ? it.meta : null;
+  dom.fieldGroups.querySelectorAll('.check').forEach(lab => {
+    const key = lab.dataset.key;
+    if(key === 'custom'){ lab.classList.remove('is-empty'); return; }
+    const ok = hasFieldData(key, meta);
+    lab.classList.toggle('is-empty', !!meta && !ok);
+    lab.title = (meta && !ok) ? '这张照片里没有这项信息' : '';
+  });
+}
+
+function buildTemplateUI(){
+  dom.tplGrid.innerHTML = '';
+  const st = ST();
+  Object.keys(TEMPLATES).forEach(key => {
+    const t = TEMPLATES[key];
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tpl';
+    b.setAttribute('aria-pressed', String(st.template === key));
+    b.title = t.name;
+    b.innerHTML = '<span class="tpl-preview">' + tplThumb(key) + '</span><span class="tpl-name">' + t.name + '</span>';
+    b.addEventListener('click', () => {
+      const s = ST();
+      const t2 = TEMPLATES[key];
+      s.template = key;
+      s.anchor = t2.anchor;
+      s.radius = t2.radius || 0;
+      s.bgOpacity = Math.round((t2.bg || 0) * 100);
+      if(t2.defaults) Object.assign(s, t2.defaults);
+      s.offsetX = 0; s.offsetY = 0;
+      syncStyleControls();
+      saveSettings(); renderPreview();
+      dom.tplGrid.querySelectorAll('.tpl').forEach(el => el.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+    });
+    dom.tplGrid.appendChild(b);
+  });
+}
+
+function tplThumb(key){
+  const on = 'background:#e9eff6;opacity:.9;border-radius:1px';
+  const amb = 'background:#fbbf24;opacity:.95';
+  switch(key){
+    case 'bar':
+      return '<i style="left:0;right:0;bottom:0;height:12px;background:#e9eff6;opacity:.24"></i><i style="left:5px;bottom:23%;width:30%;height:3px;'+on+'"></i><i style="left:5px;bottom:8%;width:48%;height:2px;'+on+';opacity:.6"></i><i style="right:5px;bottom:8%;width:22%;height:2px;'+on+';opacity:.6"></i>';
+    case 'card':
+      return '<i style="right:5px;bottom:5px;width:48%;height:12px;background:#e9eff6;opacity:.24;border-radius:3px"></i><i style="right:9px;bottom:11px;width:30%;height:3px;'+on+'"></i>';
+    case 'minimal':
+      return '<i style="left:5px;bottom:13%;width:38%;height:3px;'+on+'"></i><i style="left:5px;bottom:5%;width:54%;height:2px;'+on+';opacity:.6"></i>';
+    case 'center':
+      return '<i style="left:32%;bottom:15%;width:36%;height:3px;'+on+'"></i><i style="left:24%;bottom:5%;width:52%;height:2px;'+on+';opacity:.6"></i><i style="left:40%;bottom:27%;width:20%;height:1px;'+amb+'"></i>';
+    case 'hairline':
+      return '<i style="left:5px;bottom:26%;width:24%;height:1px;'+amb+'"></i><i style="left:5px;bottom:15%;width:38%;height:3px;'+on+'"></i><i style="left:5px;bottom:5%;width:56%;height:2px;'+on+';opacity:.6"></i>';
+    case 'corner':
+      return '<i style="right:5px;bottom:14%;width:22%;height:2px;'+on+';opacity:.85"></i><i style="right:5px;bottom:5%;width:30%;height:2px;'+on+';opacity:.5"></i>';
+    case 'glass':
+      return '<i style="left:5px;bottom:5px;width:54%;height:15px;background:#e9eff6;opacity:.15;border-radius:5px;border:1px solid rgba(233,239,246,.42)"></i><i style="left:9px;bottom:12px;width:30%;height:3px;'+on+'"></i><i style="left:9px;bottom:8px;width:38%;height:2px;'+on+';opacity:.55"></i>';
+    case 'polaroid':
+      return '<i style="left:0;right:0;top:0;bottom:0;background:#ffffff;opacity:.94"></i><i style="left:11%;right:11%;top:7%;height:50%;background:#2b3a47;opacity:.8"></i><i style="left:26%;bottom:24%;width:48%;height:2px;background:#33414d"></i><i style="left:36%;bottom:13%;width:28%;height:2px;background:#33414d;opacity:.55"></i>';
+    case 'film': {
+      let dots = '';
+      for(let i=0;i<6;i++) dots += '<i style="left:' + (i*16+3) + '%;bottom:13px;width:5px;height:2.5px;background:#e9eff6;opacity:.32;border-radius:1px"></i>';
+      return '<i style="left:0;right:0;bottom:0;height:16px;background:#0b0b0c;opacity:.96"></i>' + dots +
+             '<i style="left:6px;bottom:8px;width:28%;height:3px;'+on+'"></i><i style="left:6px;bottom:3.5px;width:40%;height:2px;'+on+';opacity:.55"></i>' +
+             '<i style="right:6px;bottom:3.5px;width:20%;height:2px;'+on+';opacity:.55"></i>';
+    }
+    case 'ticket':
+      return '<i style="left:38%;right:4px;bottom:4px;height:18px;background:#e9eff6;opacity:.2;border-radius:2px"></i>' +
+             '<i style="left:38%;right:4px;bottom:15.5px;border-top:1px dashed rgba(233,239,246,.6)"></i>' +
+             '<i style="left:36.5%;bottom:14px;width:5px;height:5px;border-radius:50%;background:#141b24"></i>' +
+             '<i style="right:1.5px;bottom:14px;width:5px;height:5px;border-radius:50%;background:#141b24"></i>' +
+             '<i style="left:43%;bottom:9px;width:26%;height:3px;'+on+'"></i><i style="left:43%;bottom:5.5px;width:40%;height:2px;'+on+';opacity:.55"></i>';
+  }
+  return '';
+}
+
+function buildAnchorUI(){
+  dom.anchorGrid.innerHTML = '';
+  Object.keys(ANCHORS).forEach(key => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(ST().anchor === key));
+    b.setAttribute('aria-label', '水印位置：' + key);
+    b.title = key;
+    b.innerHTML = '<i></i>';
+    b.addEventListener('click', () => {
+      ST().anchor = key;
+      dom.anchorGrid.querySelectorAll('button').forEach(el => el.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+      saveSettings(); renderPreview();
+    });
+    dom.anchorGrid.appendChild(b);
+  });
+}
+
+function renderThumbs(){
+  dom.thumbs.innerHTML = '';
+  state.items.forEach((it, idx) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'thumb';
+    b.setAttribute('aria-current', String(idx === state.active));
+    b.title = it.name;
+    b.setAttribute('role','tab');
+    b.innerHTML = '<img alt="" src="' + it.thumb + '"><span class="badge">' + (idx+1) + '</span>';
+    if(state.multiMode === 'per' && styleDiffers(it)){
+      b.classList.add('is-custom');
+      b.title = it.name + '（这张的版式已单独调整）';
+    }
+    b.addEventListener('click', () => setActive(idx));
+    dom.thumbs.appendChild(b);
+  });
+}
+
+function setActive(idx, silent){
+  if(idx < 0 || idx >= state.items.length) return;
+  state.active = idx;
+  const it = state.items[idx];
+
+  dom.dropzoneHost.hidden = true;
+  dom.canvasHost.hidden = false;
+  dom.stageTools.hidden = false;
+  dom.canvas.style.maxWidth = '100%';
+
+  renderThumbs();
+  syncStyleControls();     // 每张单独调整时，面板要跟着切到这张的版式
+  renderPreview();
+  renderExifTable();
+  refreshFieldAvailability();
+  updateDetectNote();
+  updateColorNote();
+  updateExportEstimate();
+
+  dom.thumbs.querySelectorAll('.thumb').forEach((el,i) => el.setAttribute('aria-current', String(i === idx)));
+  const cur = dom.thumbs.children[idx];
+  if(cur) cur.scrollIntoView({ block:'nearest', inline:'nearest' });
+  if(!silent) { /* 无额外动作 */ }
+}
+
+function updateDetectNote(){
+  const it = current();
+  if(!it){ dom.detectNote.textContent = '还没有载入照片。'; return; }
+  const m = it.meta;
+  const lines = [];
+  lines.push('<b>厂商</b>：' + (esc(m.make) || '<span style="opacity:.6">无</span>'));
+  const modelText = (ST().readableModel && m.modelNice && m.modelNice !== m.model)
+    ? esc(m.modelNice) + '<span style="opacity:.55">（原片写作 ' + esc(m.model) + '）</span>'
+    : (esc(m.model) || '<span style="opacity:.6">无</span>');
+  lines.push('<b>型号</b>：' + modelText);
+  lines.push('<b>镜头</b>：' + (esc(m.lens) || '<span style="opacity:.6">无</span>'));
+  const p = [fmtFocal(m.focal), fmtAperture(m.fNumber), m.shutter, m.iso?('ISO '+m.iso):'', m.ev].filter(Boolean).join(' · ');
+  lines.push('<b>参数</b>：' + (esc(p) || '<span style="opacity:.6">无</span>'));
+  if(m.dateText) lines.push('<b>时间</b>：' + esc(m.dateText));
+  if(it.iccDesc) lines.push('<b>色彩配置</b>：' + esc(it.iccDesc) + (it.wide ? ' <span style="color:var(--accent)">宽色域</span>' : ''));
+  if(it.previewOnly){
+    lines.push('<b style="color:var(--accent)">这是 RAW / TIFF</b>：浏览器渲染不了原始数据，' +
+      '现在用的是文件里的内嵌预览图 <b>' + it.width + '×' + it.height + '</b>' +
+      (it.meta.sourceWidth ? '（原片 ' + it.meta.sourceWidth + '×' + it.meta.sourceHeight + '）' : '') +
+      '。<br>能看图、能看参数，但<b>不适合正式出图</b>——请先用 OM Workspace / Lightroom 导出 JPEG 再拖进来。');
+  }
+  dom.detectNote.innerHTML = lines.join('<br>');
+}
+
+function updateExportEstimate(){
+  if(!state.items.length){ dom.exportEst.innerHTML = '载入照片后会显示预估信息。'; return; }
+  const it = current();
+  const st = ST();
+  const fmt = resolveFormat(it);
+  const photo = targetSize(it);
+  const L = layoutFor(photo.w, photo.h, st);
+  const w = L.cw, h = L.ch;
+  const n = state.items.length;
+  let warn = '';
+  const tpl = TEMPLATES[st.template] || TEMPLATES.bar;
+  if(tpl.frame){
+    warn += '<br><span style="opacity:.85">白框模板会在画面外加一圈边：照片仍是 ' +
+            photo.w + '×' + photo.h + '，导出成 ' + w + '×' + h + '（多出的部分是白边）。</span>';
+  }
+  if(!state.exp.maxSize && photo.w * photo.h > CANVAS_LIMIT){
+    warn += '<br><span style="color:var(--accent)">⚠ 原尺寸 ' + w + '×' + h +
+           '（' + (w * h / 1e6).toFixed(1) + ' 百万像素）超出' +
+           (IS_MOBILE ? '这台手机' : '本机浏览器') + '的画布上限，导出时会自动降到长边 ' +
+           FALLBACK_LONG_EDGE + '。想一步到位可直接选「长边 ' + FALLBACK_LONG_EDGE + '」。</span>';
+  } else if(!state.exp.maxSize && photo.w * photo.h > 30e6){
+    const est = Math.round(photo.w * photo.h / 1e6 * (fmt === 'png' ? 1.6 : (state.exp.quality > .98 ? 0.6 : 0.35)));
+    warn += '<br><span style="opacity:.85">' + (photo.w * photo.h / 1e6).toFixed(0) + ' 百万像素的原图导出：单张约 ' +
+           (est > 1024 ? (est/1024).toFixed(1) + ' GB' : est + ' MB') +
+           '，处理要几秒。只是分享的话选「长边 4096」更省事。</span>';
+  }
+  const colorBit = (!it.previewOnly && fmt !== 'webp')
+    ? (it.wide && state.exp.keepColor !== false ? ' · <b>保留 ' + esc(it.iccDesc) + '</b>'
+       : (it.iccDesc ? ' · 转 sRGB' : ''))
+    : '';
+  const rawBit = it.previewOnly
+    ? '<br><span style="color:var(--accent)">⚠ 当前是 RAW 的内嵌预览图（' + it.width + '×' + it.height +
+      '），导出的也是这个尺寸，而且<b>不会带 EXIF</b>（拍摄信息在 RAW 里，没法原样搬进 JPEG）。正式出图请先导出 JPEG。</span>'
+    : '';
+  dom.exportEst.innerHTML =
+    '共 <b>' + n + '</b> 张待导出 · 当前格式 <b>' + fmt.toUpperCase() + '</b>' +
+    (fmt === 'jpeg' ? ' · 质量 <b>' + state.exp.quality.toFixed(2) + '</b>' : ' · 无损') +
+    ' · 尺寸 <b>' + w + '×' + h + '</b>' +
+    (state.exp.keepExif && fmt === 'jpeg' ? ' · <b>保留拍摄信息</b>' : '') +
+    colorBit + warn + rawBit;
+  dom.qualityGroup.style.display = (state.exp.format === 'png') ? 'none' : '';
+}
+
+/* ---------- 图片压缩（Logo 用，避免撑爆 localStorage） ---------- */
+function shrinkImage(file, max){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const im = new Image();
+    im.onload = () => {
+      try{
+        const W = im.naturalWidth || im.width, H = im.naturalHeight || im.height;
+        const s = Math.min(1, max / Math.max(W, H));
+        const w = Math.max(1, Math.round(W * s)), h = Math.max(1, Math.round(H * s));
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const g = c.getContext('2d');
+        g.clearRect(0, 0, w, h);
+        g.drawImage(im, 0, 0, w, h);
+        const out = c.toDataURL('image/png');
+        URL.revokeObjectURL(url);
+        resolve(out);
+      }catch(err){
+        URL.revokeObjectURL(url);
+        if(err && err.name === 'SecurityError'){
+          reject(new Error('这张图有跨域内容，浏览器不允许读取。换成 PNG / JPG 原文件再试'));
+        } else reject(err);
+      }
+    };
+    im.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('浏览器解不开这种格式（建议用 PNG 或 JPG）'));
+    };
+    im.src = url;
+  });
+}
+
+/* ---------- 设置持久化 ---------- */
+const LS_KEY = 'photostamp.settings.v1';
+function saveSettings(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      fields: state.fields, style: state.style, exp: state.exp, multiMode: state.multiMode
+    }));
+    return true;
+  }catch(e){
+    if(!saveSettings.warned){
+      saveSettings.warned = true;
+      try{ toast('浏览器本地存储写满了（通常是 Logo 图太大），这次的设置没能存下来。换个更小的图或删掉几个不用的预设即可。', 'err'); }catch(_){}
+    }
+    return false;
+  }
+}
+function loadSettings(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+    if(!s) return false;
+    if(s.fields) Object.assign(state.fields, s.fields);
+    if(s.style)  Object.assign(state.style, s.style);
+    if(s.exp)    Object.assign(state.exp, s.exp);
+    if(s.multiMode === 'per' || s.multiMode === 'global') state.multiMode = s.multiMode;
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ---------- 预设（存在本机浏览器） ---------- */
+const LS_PRESETS = 'photostamp.presets.v1';
+function loadPresets(){
+  try{
+    const a = JSON.parse(localStorage.getItem(LS_PRESETS) || '[]');
+    return Array.isArray(a) ? a.filter(p => p && p.style) : [];
+  }catch(e){ return []; }
+}
+function savePresets(list){
+  try{ localStorage.setItem(LS_PRESETS, JSON.stringify(list)); return true; }
+  catch(e){
+    toast('浏览器本地存储满了，预设没存下。删掉几个不用的预设，或把 Logo 换成更小的图。', 'err');
+    return false;
+  }
+}
+function renderPresets(){
+  const host = dom.presetList;
+  if(!host) return;
+  const list = loadPresets();
+  if(!list.length){
+    host.innerHTML = '<div class="empty-hint">还没有预设。调好一套版式后，在上面输入名字点「保存」。</div>';
+    return;
+  }
+  host.innerHTML = '';
+  list.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'preset-row';
+    const nm = document.createElement('span');
+    nm.className = 'preset-name';
+    nm.textContent = p.name;
+    nm.title = String(p.at || '').slice(0, 19).replace('T', ' ') + ' · 点击套用';
+    nm.addEventListener('click', () => applyPreset(p));
+    const mk = (label, title, cls, fn) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sm' + (cls ? ' ' + cls : '');
+      btn.textContent = label;
+      btn.title = title;
+      btn.addEventListener('click', fn);
+      return btn;
+    };
+    row.appendChild(nm);
+    row.appendChild(mk('套用', '套用这套预设', '', () => applyPreset(p)));
+    row.appendChild(mk('改名', '重命名', '', () => {
+      const nv = prompt('新的预设名字', p.name);
+      if(nv === null) return;
+      const t = nv.trim();
+      if(!t) return;
+      const l = loadPresets();
+      const tgt = l.find(x => x.id === p.id);
+      if(tgt){ tgt.name = t.slice(0, 24); if(savePresets(l)) renderPresets(); }
+    }));
+    row.appendChild(mk('删', '删除这套预设', 'btn-danger', () => {
+      if(!confirm('删除预设「' + p.name + '」？')) return;
+      if(savePresets(loadPresets().filter(x => x.id !== p.id))){ renderPresets(); toast('已删除', ''); }
+    }));
+    host.appendChild(row);
+  });
+}
+function applyPreset(p){
+  state.style = Object.assign({}, DEFAULT_STYLE, p.style);
+  const keepLogo = state.style.logo;
+  state.fields = {};
+  DEFAULT_FIELDS.forEach(k => state.fields[k] = true);
+  if(p.fields) Object.assign(state.fields, p.fields);
+  if(p.exp) state.exp = Object.assign({}, DEFAULT_EXPORT, p.exp);
+  if(state.multiMode === 'per'){
+    const it = current();
+    if(it) it.style = Object.assign({}, state.style);
+  }
+  if(logoCache.src !== keepLogo) logoCache = { src:'', img:null, pending:'' };
+  saveSettings();
+  buildFieldUI();
+  syncStyleControls();
+  syncExportControls();
+  renderThumbs();
+  renderPreview();
+  updateDetectNote();
+  updateExportEstimate();
+  refreshFieldAvailability();
+  toast('已套用预设「' + p.name + '」', 'ok');
+}
+
+/* ---------- 控件同步 ---------- */
+function syncStyleControls(){
+  const st = ST();
+  setRange('offX', st.offsetX, 'offXVal', st.offsetX + '%');
+  setRange('offY', st.offsetY, 'offYVal', st.offsetY + '%');
+  setRange('sizeScale', st.sizeScale, 'sizeScaleVal', Number(st.sizeScale).toFixed(1) + '%');
+  setRange('padScale', st.padScale === undefined ? 1 : st.padScale, 'padScaleVal', Number(st.padScale === undefined ? 1 : st.padScale).toFixed(2) + '×');
+  setRange('lineGap', st.lineGap === undefined ? 1.34 : st.lineGap, 'lineGapVal', Number(st.lineGap === undefined ? 1.34 : st.lineGap).toFixed(2) + '×');
+  setRange('marginMul', st.marginMul === undefined ? 1 : st.marginMul, 'marginMulVal', Number(st.marginMul === undefined ? 1 : st.marginMul).toFixed(2) + '×');
+  setRange('bgOpacity', st.bgOpacity, 'bgOpacityVal', st.bgOpacity + '%');
+  setRange('radius', st.radius, 'radiusVal', st.radius + 'px');
+  setRange('logoScale', st.logoScale === undefined ? 1.15 : st.logoScale, 'logoScaleVal', Number(st.logoScale === undefined ? 1.15 : st.logoScale).toFixed(2) + '×');
+  setRange('logoOpacity', st.logoOpacity === undefined ? 100 : st.logoOpacity, 'logoOpacityVal', (st.logoOpacity === undefined ? 100 : st.logoOpacity) + '%');
+  $('#sepSel').value = String(st.sep);
+  $('#textColor').value = st.textColor;
+  $('#bgColor').value = st.bgColor;
+  $('#accentColor').value = st.accentColor;
+  $('#customText').value = st.customText || '';
+  const sg = $('#sigText');
+  if(sg) sg.value = st.sigText || '';
+  const bt = $('#boldTitle');
+  bt.setAttribute('aria-checked', String(!!st.boldTitle));
+  bt.textContent = st.boldTitle ? '开' : '关';
+  const rm = $('#readableModel');
+  if(rm) rm.checked = st.readableModel !== false;
+  dom.anchorGrid.querySelectorAll('button').forEach((el,i) => {
+    el.setAttribute('aria-pressed', String(Object.keys(ANCHORS)[i] === st.anchor));
+  });
+  dom.tplGrid.querySelectorAll('.tpl').forEach((el,i) => {
+    el.setAttribute('aria-pressed', String(Object.keys(TEMPLATES)[i] === st.template));
+  });
+  document.querySelectorAll('#sigAlignSeg button').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.al === (st.sigAlign || 'right')));
+  });
+  document.querySelectorAll('#logoPosSeg button').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.pos === (st.logoPos || 'left')));
+  });
+  syncLogoSlot(st);
+  syncMultiUI();
+}
+
+function syncLogoSlot(st){
+  const slot = dom.logoSlot;
+  if(!slot) return;
+  if(st.logo){
+    slot.innerHTML = '<img alt="logo 预览" src="' + st.logo + '">';
+  } else {
+    slot.innerHTML = '<span>未选择</span>';
+  }
+  const clr = $('#btnLogoClear');
+  if(clr) clr.disabled = !st.logo;
+}
+
+function syncMultiUI(){
+  const per = state.multiMode === 'per';
+  if(dom.multiSeg){
+    dom.multiSeg.querySelectorAll('button').forEach(b => {
+      b.setAttribute('aria-pressed', String(b.dataset.mode === state.multiMode));
+    });
+  }
+  if(dom.btnApplyAll){
+    dom.btnApplyAll.hidden = !per || state.items.length < 2;
+    dom.btnApplyAll.textContent = '把这张的版式应用到全部 ' + state.items.length + ' 张';
+  }
+  if(dom.multiNote){
+    dom.multiNote.innerHTML = per
+      ? '当前<b>每张单独调整</b>：拖一下滑块只影响这张图（缩略图右上角有圆点的就是改过的）。要统一，用下面的按钮一次性刷到全部。'
+      : '当前<b>全局同步</b>：改一次，所有照片一起变。横竖混排想分别微调，切成「每张单独调整」。';
+  }
+}
+function setRange(id, val, outId, outText){
+  const el = document.getElementById(id);
+  if(el) el.value = val;
+  const o = document.getElementById(outId);
+  if(o) o.textContent = outText;
+}
+function syncExportControls(){
+  const e = state.exp;
+  $('#formatSeg').querySelectorAll('button').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.fmt === e.format));
+  });
+  $('#sizeSeg').querySelectorAll('button').forEach(b => {
+    b.setAttribute('aria-pressed', String(Number(b.dataset.size) === Number(e.maxSize)));
+  });
+  $('#quality').value = e.quality;
+  $('#qualityVal').textContent = Number(e.quality).toFixed(2);
+  syncQualityPresets();
+  $('#keepExif').checked = !!e.keepExif;
+  const kc = $('#keepColor');
+  if(kc) kc.checked = e.keepColor !== false;
+  $('#nameSuffix').value = e.suffix;
+  updateSizeNote();
+  updateColorNote();
+  updateExportEstimate();
+}
+function syncQualityPresets(){
+  const q = Number(state.exp.quality);
+  document.querySelectorAll('#qualityPresets button').forEach(b => {
+    b.setAttribute('aria-pressed', String(Math.abs(Number(b.dataset.q) - q) < 0.005));
+  });
+}
+function updateSizeNote(){
+  const m = state.exp.maxSize;
+  dom.sizeNote.textContent = m
+    ? '会把长边缩到 ' + m + 'px 再加水印，适合发朋友圈、聊天分享。'
+    : '原始尺寸导出时，像素完全不缩放，画质只受上面质量档影响。';
+}
+
+/** 色彩配置那块的状态说明：原图带什么配置、导出会怎么处理 */
+function updateColorNote(){
+  const el = dom.colorNote;
+  if(!el) return;
+  const it = current();
+  if(!it){
+    el.innerHTML = '原图如果带 Adobe RGB 之类的宽色域配置，勾选后会保留原样；不然会被压成 sRGB，超出 sRGB 的鲜艳色会被裁掉。';
+    return;
+  }
+  const kc = $('#keepColor');
+  if(kc) kc.checked = state.exp.keepColor !== false;
+  if(it.previewOnly){
+    el.innerHTML = '这张是 RAW / TIFF，用的是内嵌预览图，色彩配置跟随预览图，无法沿用原片。<br><b>正式出图请先用 OM Workspace / Lightroom 导出 JPEG。</b>';
+    return;
+  }
+  if(!it.iccDesc){
+    el.innerHTML = '这张照片<b>没有内嵌色彩配置</b>（相机设成 sRGB 就是这个情况），按 sRGB 处理，不存在丢色问题。';
+    return;
+  }
+  if(!it.wide){
+    el.innerHTML = '检测到色彩配置：<b>' + esc(it.iccDesc) + '</b>。<br>' +
+      '这台浏览器不能按原样解码这个配置，导出时会转换成 sRGB 并<b>正确标记为 sRGB</b>——颜色不会错，但超出 sRGB 的极鲜艳部分会被裁掉。';
+    return;
+  }
+  el.innerHTML = '检测到宽色域配置：<b>' + esc(it.iccDesc) + '</b>。<br>' +
+    (state.exp.keepColor === false
+      ? '当前<b>关闭</b>了保留：会被转换成 sRGB（分享到哪都不会变色，代价是裁掉超出 sRGB 的颜色）。'
+      : '当前会<b>原样保留</b>：导出图仍是 ' + esc(it.iccDesc) + '，色彩一点不丢。<br>' +
+        '<span style="opacity:.75">注意：个别不认色彩配置的看图/网页会显示得偏淡，这是它的问题，不是图坏了。</span>');
+}
+
+/* ---------- Tab 切换 ---------- */
+function initTabs(){
+  const tabs = [['tab-content','panel-content'],['tab-style','panel-style'],['tab-export','panel-export']];
+  tabs.forEach(([tid, pid]) => {
+    const t = document.getElementById(tid);
+    t.addEventListener('click', () => {
+      tabs.forEach(([a, b]) => {
+        const ta = document.getElementById(a), pb = document.getElementById(b);
+        const on = (a === tid);
+        ta.setAttribute('aria-selected', String(on));
+        ta.tabIndex = on ? 0 : -1;
+        pb.hidden = !on;
+      });
+    });
+    t.addEventListener('keydown', ev => {
+      const idx = tabs.findIndex(x => x[0] === tid);
+      let ni = -1;
+      if(ev.key === 'ArrowRight') ni = (idx+1) % tabs.length;
+      if(ev.key === 'ArrowLeft')  ni = (idx-1+tabs.length) % tabs.length;
+      if(ni >= 0){ ev.preventDefault(); document.getElementById(tabs[ni][0]).focus(); document.getElementById(tabs[ni][0]).click(); }
+    });
+  });
+}
+
+/* ---------- 主题 ---------- */
+function initTheme(){
+  let t = 'dark';
+  try{ t = localStorage.getItem('photostamp.theme') || 'dark'; }catch(e){}
+  document.documentElement.setAttribute('data-theme', t);
+  $('#btnTheme').addEventListener('click', () => {
+    const now = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', now);
+    try{ localStorage.setItem('photostamp.theme', now); }catch(e){}
+  });
+}
+
+/* ---------- Toast ---------- */
+let toastTimer = null;
+function toast(msg, kind){
+  const el = document.createElement('div');
+  el.className = 'toast ' + (kind || '');
+  el.innerHTML = '<span class="dot"></span><span>' + esc(msg) + '</span>';
+  dom.toastHost.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity .25s, transform .25s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(8px)';
+    setTimeout(() => el.remove(), 300);
+  }, kind === 'err' ? 4200 : 3200);
+  while(dom.toastHost.children.length > 3) dom.toastHost.firstChild.remove();
+}
+
+let busyMsgEl = null;
+function setBusy(on, msg){
+  state.busy = on;
+  ['btnExportOne','btnExportAll','btnExportAll2','btnClear'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.disabled = on;
+  });
+  if(on){
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = '<span class="spin"></span><span>' + esc(msg || '处理中…') + '</span>';
+    dom.toastHost.appendChild(el);
+    busyMsgEl = el;
+  } else if(busyMsgEl){
+    busyMsgEl.remove(); busyMsgEl = null;
+  }
+}
+function updateProgress(txt){
+  if(busyMsgEl) busyMsgEl.lastElementChild.textContent = '正在导出 ' + txt + '…';
+}
+
+/* ---------- 工具 ---------- */
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function fmtSize(b){
+  if(b < 1024) return b + ' B';
+  if(b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(2) + ' MB';
+}
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+/* ============================================================
+   7. 初始化
+   ============================================================ */
+function init(){
+  const hadSaved = loadSettings();
+  // 手机首次打开：默认按长边 2560 导出。手机拍的照片动辄 4000 万像素，
+  // 原尺寸既慢又容易顶到画布上限，分享用不着那么大；用户仍可手动切回原始尺寸。
+  if(IS_MOBILE && !hadSaved) state.exp.maxSize = FALLBACK_LONG_EDGE;
+  initTheme();
+
+  // 触屏上"拖进来""Ctrl+V"都不存在，换成手机看得懂的话
+  if(IS_TOUCH){
+    const h2 = document.querySelector(".dropzone h2");
+    const hint = document.querySelector(".file-hint");
+    if(h2) h2.textContent = "点击选择照片";
+    if(hint) hint.textContent = IS_MOBILE
+      ? "可一次选多张 · 建议先「添加到主屏幕」，以后从桌面图标打开"
+      : "可一次选多张，也可以直接把照片拖进来";
+  }
+  initTabs();
+  buildFieldUI();
+  buildTemplateUI();
+  buildAnchorUI();
+  renderPresets();
+  syncStyleControls();
+  syncExportControls();
+
+  /* --- 文件输入 --- */
+  dom.fileInput.addEventListener('change', e => {
+    if(e.target.files && e.target.files.length) loadFiles(e.target.files);
+    e.target.value = '';
+  });
+
+  /* --- 拖放 --- */
+  ['dragenter','dragover'].forEach(ev => {
+    document.addEventListener(ev, e => {
+      if(e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')){
+        e.preventDefault();
+        dom.dropzone.classList.add('is-drag');
+      }
+    });
+  });
+  ['dragleave','drop'].forEach(ev => {
+    document.addEventListener(ev, e => {
+      if(ev === 'dragleave' && e.relatedTarget) return;
+      dom.dropzone.classList.remove('is-drag');
+    });
+  });
+  document.addEventListener('drop', e => {
+    if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){
+      e.preventDefault();
+      loadFiles(e.dataTransfer.files);
+    }
+  });
+
+  /* --- 粘贴 --- */
+  document.addEventListener('paste', e => {
+    const items = e.clipboardData && e.clipboardData.files;
+    if(items && items.length) loadFiles(items);
+  });
+
+  /* --- 快捷键 --- */
+  document.addEventListener('keydown', e => {
+    if(e.target.matches('input,textarea,select')) return;
+    if(e.key === 'ArrowLeft' && state.items.length > 1) setActive(Math.max(0, state.active-1));
+    if(e.key === 'ArrowRight' && state.items.length > 1) setActive(Math.min(state.items.length-1, state.active+1));
+  });
+
+  /* --- 预览工具条 --- */
+  $('#btnPrev').addEventListener('click', () => setActive(Math.max(0, state.active-1)));
+  $('#btnNext').addEventListener('click', () => setActive(Math.min(state.items.length-1, state.active+1)));
+  $('#btnExportOne').addEventListener('click', exportActive);
+  $('#btnExportAll').addEventListener('click', exportAll);
+  $('#btnExportAll2').addEventListener('click', exportAll);
+  $('#btnClear').addEventListener('click', () => {
+    state.items.forEach(it => { try{ URL.revokeObjectURL(it.url); }catch(e){} });
+    state.items = []; state.active = -1;
+    dom.canvasHost.hidden = true; dom.stageTools.hidden = true;
+    dom.dropzoneHost.hidden = false; dom.exifBox.hidden = true;
+    renderThumbs(); refreshFieldAvailability(); updateExportEstimate();
+    dom.detectNote.textContent = '还没有载入照片。载入后这里会列出识别到的厂商 / 镜头 / 参数。';
+    dom.fileInput.value = '';
+  });
+
+  /* --- 字段：自定义文字 --- */
+  $('#customText').addEventListener('input', e => {
+    ST().customText = e.target.value;
+    saveSettings(); scheduleRender();
+    const lab = dom.fieldGroups.querySelector('.check[data-key="custom"]');
+    if(lab && e.target.value && !state.fields.custom){
+      state.fields.custom = true;
+      lab.querySelector('input').checked = true;
+      saveSettings();
+    }
+  });
+
+  /* --- 样式控件 --- */
+  const rangeMap = [
+    ['offX','offsetX','offXVal', v => v + '%'],
+    ['offY','offsetY','offYVal', v => v + '%'],
+    ['sizeScale','sizeScale','sizeScaleVal', v => Number(v).toFixed(1) + '%'],
+    ['padScale','padScale','padScaleVal', v => Number(v).toFixed(2) + '×'],
+    ['lineGap','lineGap','lineGapVal', v => Number(v).toFixed(2) + '×'],
+    ['marginMul','marginMul','marginMulVal', v => Number(v).toFixed(2) + '×'],
+    ['bgOpacity','bgOpacity','bgOpacityVal', v => v + '%'],
+    ['radius','radius','radiusVal', v => v + 'px'],
+    ['logoScale','logoScale','logoScaleVal', v => Number(v).toFixed(2) + '×'],
+    ['logoOpacity','logoOpacity','logoOpacityVal', v => v + '%']
+  ];
+  rangeMap.forEach(([id, key, outId, fmt]) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input', e => {
+      const v = Number(e.target.value);
+      ST()[key] = v;
+      document.getElementById(outId).textContent = fmt(v);
+      if(state.multiMode === 'per') renderThumbs();
+      saveSettings(); scheduleRender();
+    });
+  });
+  $('#sepSel').addEventListener('change', e => { ST().sep = Number(e.target.value); saveSettings(); renderPreview(); });
+  ['textColor','bgColor','accentColor'].forEach(id => {
+    document.getElementById(id).addEventListener('input', e => {
+      ST()[id] = e.target.value;
+      saveSettings(); scheduleRender();
+    });
+  });
+  $('#boldTitle').addEventListener('click', e => {
+    const s = ST();
+    s.boldTitle = !s.boldTitle;
+    e.target.setAttribute('aria-checked', String(s.boldTitle));
+    e.target.textContent = s.boldTitle ? '开' : '关';
+    saveSettings(); renderPreview();
+  });
+  $('#sigText').addEventListener('input', e => {
+    ST().sigText = e.target.value;
+    saveSettings(); scheduleRender();
+  });
+  document.querySelectorAll('#sigAlignSeg button').forEach(b => {
+    b.addEventListener('click', () => {
+      ST().sigAlign = b.dataset.al;
+      document.querySelectorAll('#sigAlignSeg button').forEach(x => x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+      saveSettings(); renderPreview();
+    });
+  });
+  document.querySelectorAll('#logoPosSeg button').forEach(b => {
+    b.addEventListener('click', () => {
+      ST().logoPos = b.dataset.pos;
+      document.querySelectorAll('#logoPosSeg button').forEach(x => x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+      saveSettings(); renderPreview();
+    });
+  });
+
+  /* --- 多图版式模式 --- */
+  dom.multiSeg.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      const mode = b.dataset.mode;
+      if(mode === state.multiMode) return;
+      if(mode === 'global'){
+        // 切回全局：把当前这张的版式作为全局，其余图的个性化保留但不再生效
+        const cur = current();
+        if(cur && cur.style && state.items.some(x => x.style)){
+          state.style = Object.assign({}, cur.style);
+        }
+        state.multiMode = 'global';
+      } else {
+        state.multiMode = 'per';
+      }
+      syncStyleControls(); saveSettings(); renderThumbs(); renderPreview();
+      toast(mode === 'per' ? '已切换：每张照片的版式可单独调整' : '已切换：所有照片共用一套版式', '');
+    });
+  });
+  dom.btnApplyAll.addEventListener('click', () => {
+    const src = Object.assign({}, ST());
+    state.style = Object.assign({}, src);
+    state.items.forEach(it => { it.style = Object.assign({}, src); });
+    syncStyleControls(); saveSettings(); renderThumbs(); renderPreview();
+    toast('已把当前版式应用到全部 ' + state.items.length + ' 张照片', 'ok');
+  });
+
+  /* --- Logo 图片 --- */
+  $('#btnLogoPick').addEventListener('click', () => dom.logoInput.click());
+  $('#btnLogoClear').addEventListener('click', () => {
+    ST().logo = '';
+    syncLogoSlot(ST()); saveSettings(); renderPreview();
+  });
+  dom.logoInput.addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    try{
+      const dataUrl = await shrinkImage(file, 512);
+      ST().logo = dataUrl;
+      logoCache = { src:'', img:null, pending:'' };
+      syncLogoSlot(ST()); saveSettings(); renderPreview();
+      toast('Logo 已加入（会自动缩到 512px 存在本机）', 'ok');
+    }catch(err){
+      toast('这张图读不出来：' + err.message, 'err');
+    }
+  });
+
+  /* --- 预设 --- */
+  $('#btnPresetSave').addEventListener('click', () => {
+    const name = (dom.presetName.value || '').trim();
+    if(!name){ toast('先给预设起个名字', 'err'); dom.presetName.focus(); return; }
+    const list = loadPresets();
+    const item = {
+      id: 'p' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      name, at: new Date().toISOString(),
+      style: Object.assign({}, ST()),
+      fields: Object.assign({}, state.fields),
+      exp: Object.assign({}, state.exp)
+    };
+    const dup = list.findIndex(p => p.name === name);
+    if(dup >= 0) list[dup] = item; else list.push(item);
+    if(savePresets(list)){
+      dom.presetName.value = '';
+      renderPresets();
+      toast(dup >= 0 ? '预设「' + name + '」已更新' : '预设「' + name + '」已保存', 'ok');
+    }
+  });
+  $('#btnPresetExport').addEventListener('click', () => {
+    const list = loadPresets();
+    if(!list.length){ toast('还没有预设可导出', 'err'); return; }
+    const blob = new Blob([JSON.stringify({ app:'光影印章', version:1, presets:list }, null, 2)],
+                          { type:'application/json' });
+    download(blob, '光影印章-预设-' + new Date().toISOString().slice(0,10) + '.json');
+    toast('已导出 ' + list.length + ' 套预设', 'ok');
+  });
+  $('#btnPresetImport').addEventListener('click', () => dom.presetFile.click());
+  dom.presetFile.addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    try{
+      const txt = await file.text();
+      const obj = JSON.parse(txt);
+      const incoming = Array.isArray(obj) ? obj : (obj && obj.presets);
+      if(!Array.isArray(incoming) || !incoming.length) throw new Error('文件里没有找到预设');
+      const list = loadPresets();
+      let added = 0;
+      incoming.forEach(p => {
+        if(!p || !p.style) return;
+        const it = {
+          id: 'p' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          name: String(p.name || '导入的预设').slice(0, 24),
+          at: new Date().toISOString(),
+          style: Object.assign({}, DEFAULT_STYLE, p.style),
+          fields: Object.assign({}, p.fields || {}),
+          exp: Object.assign({}, DEFAULT_EXPORT, p.exp || {})
+        };
+        const same = list.findIndex(x => x.name === it.name);
+        if(same >= 0) list[same] = it; else list.push(it);
+        added++;
+      });
+      if(savePresets(list)){ renderPresets(); toast('已导入 ' + added + ' 套预设', 'ok'); }
+    }catch(err){
+      toast('导入失败：' + err.message, 'err');
+    }
+  });
+  $('#btnReset').addEventListener('click', () => {
+    const perMode = state.multiMode === 'per';
+    if(perMode){
+      const it = current();
+      if(it) it.style = Object.assign({}, DEFAULT_STYLE);
+    } else {
+      state.style = Object.assign({}, DEFAULT_STYLE);
+    }
+    Object.keys(state.fields).forEach(k => state.fields[k] = false);
+    DEFAULT_FIELDS.forEach(k => state.fields[k] = true);
+    saveSettings();
+    buildFieldUI();
+    syncStyleControls();
+    renderThumbs();
+    renderPreview();
+    toast(perMode ? '这张照片的版式已恢复默认' : '样式已恢复默认', 'ok');
+  });
+
+  /* --- 导出控件 --- */
+  $('#formatSeg').addEventListener('click', e => {
+    const b = e.target.closest('button[data-fmt]');
+    if(!b) return;
+    state.exp.format = b.dataset.fmt;
+    syncExportControls(); saveSettings();
+  });
+  $('#sizeSeg').addEventListener('click', e => {
+    const b = e.target.closest('button[data-size]');
+    if(!b) return;
+    state.exp.maxSize = Number(b.dataset.size);
+    syncExportControls(); saveSettings();
+  });
+  $('#quality').addEventListener('input', e => {
+    state.exp.quality = Number(e.target.value);
+    $('#qualityVal').textContent = state.exp.quality.toFixed(2);
+    syncQualityPresets();
+    updateExportEstimate(); saveSettings();
+  });
+  $('#qualityPresets').addEventListener('click', e => {
+    const b = e.target.closest('button[data-q]');
+    if(!b) return;
+    state.exp.quality = Number(b.dataset.q);
+    $('#quality').value = state.exp.quality;
+    $('#qualityVal').textContent = state.exp.quality.toFixed(2);
+    syncQualityPresets();
+    updateExportEstimate(); saveSettings();
+  });
+  $('#keepExif').addEventListener('change', e => {
+    state.exp.keepExif = e.target.checked;
+    updateExportEstimate(); saveSettings();
+  });
+  const kcEl = $('#keepColor');
+  if(kcEl) kcEl.addEventListener('change', e => {
+    state.exp.keepColor = e.target.checked;
+    updateColorNote(); updateExportEstimate(); saveSettings();
+  });
+  const rmEl = $('#readableModel');
+  if(rmEl) rmEl.addEventListener('change', e => {
+    ST().readableModel = e.target.checked;
+    saveSettings(); renderPreview(); updateDetectNote();
+  });
+  $('#nameSuffix').addEventListener('input', e => {
+    state.exp.suffix = e.target.value;
+    saveSettings();
+  });
+
+  /* --- 帮助 --- */
+  $('#btnHelp').addEventListener('click', () => {
+    const L = [
+      '光影印章 · 使用说明',
+      '',
+      '1. 选照片（可多张）——' + (IS_MOBILE ? '点一下打开相册。' : '拖入、点击选择，或按 Ctrl+V 粘贴截图。'),
+      '2. 「显示内容」勾选想在照片上出现的信息，实时合成到预览。',
+      '3. 「版式样式」换模板、改位置、调字号和颜色。',
+      '4. 「导出设置」选格式、质量、尺寸。默认保留 EXIF / XMP / 版权。',
+      '',
+      '关于画质：画上文字就必须重新编码一次，JPEG 天生有损；',
+      '质量 1.00 最接近原图，要绝对无损请选 PNG。',
+      '',
+      '相机原片：',
+      '· 索尼把机型写成 ILCE-1 这类编号，勾「机型用通用名字」会显示成 A1。',
+      '· Adobe RGB 的原片默认会原样保留色彩配置，不会被压成 sRGB。',
+      '· ARW / RAW 浏览器解不了，会自动用文件里的内嵌预览图（索尼通常只有 1616×1080），',
+      '  能看图、看参数，但不适合正式出图——请先用 OM Workspace / Lightroom 导出 JPEG。',
+    ];
+    if(IS_MOBILE){
+      L.push('',
+        '手机使用提示：',
+        '· 照片只在你手机里处理，不联网、不上传。',
+        '· 导出后 iOS 存到「文件 › 下载」，安卓存到「下载」。',
+        '· 大图默认按长边 ' + FALLBACK_LONG_EDGE + ' 导出；想要原始尺寸可在「输出尺寸」切回。',
+        '· iPhone「高效」格式的照片是 HEIC，选图时系统会转成 JPEG，EXIF 保留。',
+        '· 把本页「添加到主屏幕」，可像 App 一样全屏使用。');
+    }else{
+      L.push('', '快捷键：← → 切换照片。照片只在本机处理，不上传服务器。');
+    }
+    alert(L.join('\n'));
+  });
+
+  /* --- 窗口尺寸变化时重绘（保持清晰） --- */
+  let rz = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(rz);
+    rz = setTimeout(() => { if(current()) renderPreview(); }, 180);
+  });
+
+  updateExportEstimate();
+}
+
+init();
+</script>
+</body>
+</html>
