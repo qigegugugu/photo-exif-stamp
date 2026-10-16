@@ -162,6 +162,21 @@ html[data-theme="light"] .canvas-wrap{
 #preview{display:block;max-width:100%;height:auto;max-height:64vh}
 @media (min-width:960px){ #preview{max-height:74vh} }
 
+/* 预览区大小切换（只在手机 / 窄屏出现，宽屏本来就不缺地方） */
+.pv-size{
+  display:none; position:absolute; top:var(--sp-2); right:var(--sp-2); z-index:2;
+  width:44px; height:44px; border-radius:var(--r-full);
+  align-items:center; justify-content:center; padding:0;
+  border:1px solid rgba(255,255,255,.3); background:rgba(10,14,20,.52); color:#fff;
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.pv-size svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pv-size:hover{background:rgba(10,14,20,.72)}
+.pv-size:active{transform:scale(.93)}
+.pv-size[aria-pressed="true"]{background:var(--amber-400); border-color:var(--amber-300); color:#2a1a00}
+
 /* ---------- 缩略图条 ---------- */
 .thumbs{
   display:flex; gap:var(--sp-2); overflow-x:auto; padding:var(--sp-1) 2px var(--sp-2);
@@ -385,6 +400,16 @@ input[type=color]{
 }
 .note b{color:var(--text-dim)}
 
+/* 可折叠的信息块：手机上默认收起，把高度让给能操作的控件 */
+details.disclose{display:flex; flex-direction:column; gap:var(--sp-3)}
+details.disclose > summary{list-style:none; cursor:pointer}
+details.disclose > summary::-webkit-details-marker{display:none}
+details.disclose > summary::before{
+  content:"▸"; color:var(--accent); display:inline-block;
+  transition:transform var(--t-base) var(--ease);
+}
+details.disclose[open] > summary::before{transform:rotate(90deg)}
+
 /* ---------- EXIF 明细 ---------- */
 details.exif{
   background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
@@ -521,6 +546,15 @@ details.exif[open] summary::before{transform:rotate(90deg)}
   /* 让「图片 + 工具条 + 缩略图」整体塞得进视口，sticky 才不会半截被裁 */
   #preview{max-height:calc(100dvh - var(--topbar-h, 56px) - 240px)}
 }
+/* ============================================================
+   窄屏（手机）：把粘性块里的"固定开销"压到最小
+   ------------------------------------------------------------
+   缩略图 / 图片 / 工具条 / EXIF 摘要 挤在同一个粘性块里，
+   固定开销实测能吃掉视口 60%+，设置面板就只剩一行可操作。
+   这里的图片高度不再写死百分比，而是由脚本按
+     视口高度 − 顶栏 − 实测固定开销 − 给面板预留的份额
+   算出来写进 --pv-h，因此不同机型 / 分辨率 / 横竖屏各得其所。
+   ============================================================ */
 @media (max-width:959px){
   .layout{display:block}
   .stage{
@@ -528,11 +562,57 @@ details.exif[open] summary::before{transform:rotate(90deg)}
     top:var(--topbar-h, 56px);
     z-index:20;
     background:var(--bg);
-    padding-bottom:var(--sp-2);
+    gap:var(--sp-2);                       /* 12 → 8，三处缝隙省下 12px */
+    padding-bottom:var(--sp-1);            /* 12 → 4 */
     box-shadow:0 12px 20px -18px rgba(0,0,0,.9);
   }
-  .panel{margin-top:var(--sp-4)}
-  #preview{max-height:min(34dvh, 300px)}
+  .panel{margin-top:var(--sp-2)}           /* 16 → 8 */
+
+  /* 欢迎页（还没图片）：整页正常滚动，不必把拖放区钉在顶上 */
+  .layout:has(#canvasHost[hidden]) .stage{position:static}
+
+  /* 图片高度：脚本实测写入。脚本没跑（禁用 JS）时退回保守值 */
+  #preview{
+    max-height:var(--pv-h, min(30dvh, 260px));
+    transition:max-height var(--t-fast) var(--ease);
+  }
+  .canvas-wrap{min-height:0}               /* 原来固定 200px 会把预算撑破 */
+  .pv-size{display:flex}
+
+  /* 缩略图 76 → 52：省 24px，仍然好点 */
+  .thumbs{padding:0 2px var(--sp-1); gap:var(--sp-1)}
+  .thumb{width:52px; height:52px; border-width:2px}
+  .thumb .badge{font-size:8.5px; padding:1px 0}
+  .thumb .unread{top:2px; right:2px; width:7px; height:7px}
+
+  /* 工具条：按钮压矮压窄（仍守住 44px 触控线），缝隙收紧 */
+  .stage-tools{gap:var(--sp-1)}
+  .stage-tools .btn{padding:9px 11px; min-height:44px; font-size:13.5px}
+  .stage-tools .btn svg{width:16px; height:16px}
+  .btn-step{padding:9px; min-width:44px}   /* 上一张 / 下一张：只留箭头 */
+  .btn-step .btxt{display:none}
+
+  /* 参数行：小屏上换行会吃掉整行。flex-basis 必须给具体值（不能 auto），
+     否则浏览器按"整行文字"的假定宽度计算，直接把它顶到下一行 */
+  .stage-meta{
+    flex:1 1 120px; min-width:104px; margin-left:0; text-align:left; font-size:11px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  details.exif summary{padding:11px var(--sp-3); font-size:13px}
+  details.disclose > summary{padding:11px 0; min-height:44px}   /* 可折叠标题也要够点得着 */
+  .brand-text p{display:none}              /* 顶栏副标题：小屏省一行 */
+  /* 面板内部再挤一挤，多露一行控件 */
+  .tabs{border-bottom-width:1px}
+  .tab{padding:12px 6px}
+  .tabpanel{padding:var(--sp-2) var(--sp-4) var(--sp-4); gap:var(--sp-3)}
+  .note{padding:8px 10px}
+}
+
+/* 横屏手机 / 极矮视口（<480px 高）：粘性块根本塞不下图片+工具条，
+   硬留只会让设置面板变成 0 像素，所以退回整页滚动，各自摊开 */
+@media (max-width:959px) and (max-height:479px){
+  .stage{position:static}
+  #preview{max-height:min(58dvh, 300px)}
 }
 </style>
 </head>
@@ -584,15 +664,19 @@ details.exif[open] summary::before{transform:rotate(90deg)}
     <div id="canvasHost" hidden>
       <div class="canvas-wrap">
         <canvas id="preview" role="img" aria-label="带水印的照片预览"></canvas>
+        <button class="pv-size" id="btnPvSize" type="button" aria-pressed="false"
+                title="切换预览区大小" aria-label="切换预览区大小">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+        </button>
       </div>
     </div>
 
     <div class="stage-tools" id="stageTools" hidden>
-      <button class="btn btn-sm" id="btnPrev" type="button" aria-label="上一张">
-        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>上一张
+      <button class="btn btn-sm btn-step" id="btnPrev" type="button" aria-label="上一张">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="btxt">上一张</span>
       </button>
-      <button class="btn btn-sm" id="btnNext" type="button" aria-label="下一张">
-        下一张<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      <button class="btn btn-sm btn-step" id="btnNext" type="button" aria-label="下一张">
+        <span class="btxt">下一张</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
       </button>
       <button class="btn btn-sm" id="btnExportOne" type="button">
         <svg viewBox="0 0 24 24"><path d="M12 4v11M12 15l-4-4M12 15l4-4"/><path d="M5 19h14"/></svg>
@@ -623,8 +707,10 @@ details.exif[open] summary::before{transform:rotate(90deg)}
     <!-- ---------- 显示内容 ---------- -->
     <div class="tabpanel" id="panel-content" role="tabpanel" aria-labelledby="tab-content">
       <div class="group">
-        <div class="group-title">自动识别到的信息</div>
-        <div class="note" id="detectNote">还没有载入照片。载入后这里会列出识别到的厂商 / 镜头 / 参数。</div>
+        <details class="disclose" id="detectBox" open>
+          <summary class="group-title">自动识别到的信息</summary>
+          <div class="note" id="detectNote">还没有载入照片。载入后这里会列出识别到的厂商 / 镜头 / 参数。</div>
+        </details>
       </div>
 
       <div class="group">
@@ -1030,7 +1116,8 @@ const state = {
   exp: Object.assign({}, DEFAULT_EXPORT),
   previewScale: 1,
   busy: false,
-  multiMode: 'global'   // 'global' 全部照片共用一套版式 | 'per' 每张单独调整
+  multiMode: 'global',  // 'global' 全部照片共用一套版式 | 'per' 每张单独调整
+  ui: { pvBig:false }   // 手机上预览区是否放大（留给设置面板的地方相应变少）
 };
 DEFAULT_FIELDS.forEach(k => state.fields[k] = true);
 
@@ -1053,7 +1140,7 @@ function styleDiffers(it){
 const $ = s => document.querySelector(s);
 const dom = {
   fileInput: $('#fileInput'), dropzone:$('#dropzone'), dropzoneHost:$('#dropzoneHost'),
-  canvasHost:$('#canvasHost'), canvas:$('#preview'),
+  canvasHost:$('#canvasHost'), canvas:$('#preview'), pvSize:$('#btnPvSize'),
   thumbs:$('#thumbs'), stageTools:$('#stageTools'), stageMeta:$('#stageMeta'),
   exifBox:$('#exifBox'), exifBody:$('#exifBody'), detectNote:$('#detectNote'),
   fieldGroups:$('#fieldGroups'), tplGrid:$('#tplGrid'), anchorGrid:$('#anchorGrid'),
@@ -2948,9 +3035,11 @@ function setActive(idx, silent){
   dom.canvas.style.maxWidth = '100%';
 
   renderThumbs();
+  syncStagePreview();      // 缩略图/工具条/EXIF 摘要的高度都会变，图片预算跟着重算
   syncStyleControls();     // 每张单独调整时，面板要跟着切到这张的版式
   renderPreview();
   renderExifTable();
+  if(syncStagePreview()) scheduleRender();   // EXIF 摘要的显隐会改变固定开销
   refreshFieldAvailability();
   updateDetectNote();
   updateColorNote();
@@ -3067,7 +3156,8 @@ const LS_KEY = 'photostamp.settings.v1';
 function saveSettings(){
   try{
     localStorage.setItem(LS_KEY, JSON.stringify({
-      fields: state.fields, style: state.style, exp: state.exp, multiMode: state.multiMode
+      fields: state.fields, style: state.style, exp: state.exp, multiMode: state.multiMode,
+      ui: state.ui
     }));
     return true;
   }catch(e){
@@ -3086,6 +3176,7 @@ function loadSettings(){
     if(s.style)  Object.assign(state.style, s.style);
     if(s.exp)    Object.assign(state.exp, s.exp);
     if(s.multiMode === 'per' || s.multiMode === 'global') state.multiMode = s.multiMode;
+    if(s.ui && typeof s.ui.pvBig === 'boolean') state.ui.pvBig = s.ui.pvBig;
     return true;
   }catch(e){ return false; }
 }
@@ -3408,6 +3499,111 @@ function syncTopbarHeight(){
 }
 
 /* ============================================================
+   窄屏预览区高度预算（手机 / 小窗）
+   ------------------------------------------------------------
+   问题：手机上「缩略图 + 图片 + 工具条 + EXIF 摘要」全在一个粘性块
+   里，这些固定开销实测能占掉视口 60% 以上；图片再固定拿走 34dvh，
+   设置面板就只剩一百来像素（约一行勾选项），没法用。
+
+   做法：不写死百分比，而是实测后算——
+     --pv-h = 视口高 − 顶栏 − 粘性块实测固定开销 − 给面板预留的份额
+   预留份额按视口比例给（normal 42% / 大图模式 20%），并设上下限，
+   于是不同机型、分辨率、横竖屏都能各自得到合适的比例。
+   没有图片（欢迎页）或宽屏时不参与，直接清掉变量走原样式。
+   ============================================================ */
+const PV_BUDGET_RATIO = { normal:0.42, big:0.20 };  // 设置面板至少占视口的比例
+const PV_MAX_RATIO    = 0.46;    // 图片最多占视口
+const PV_FLOOR_RATIO  = 0.17;    // 图片保底占视口
+const PV_FLOOR_MIN    = 120;     // 且不低于这个像素高
+const PV_MIN_BUDGET   = 190;     // 给面板至少留这么多像素
+const SHORT_VH        = 480;     // 矮于这个高度（横屏手机）不做粘性预算，走 CSS 的整页滚动
+
+/* 真实可视高度：Edge/Chrome 地址栏收放、软键盘弹出都会改变它 */
+function appViewportHeight(){
+  const vv = window.visualViewport;
+  const h = (vv && vv.height) || window.innerHeight || document.documentElement.clientHeight || 0;
+  return Math.round(h);
+}
+
+let lastPvH = 0;
+/* 返回值：这次有没有改动 --pv-h（调用方据此决定要不要重画预览） */
+function syncStagePreview(){
+  const root = document.documentElement;
+  const stage = dom.canvasHost && dom.canvasHost.parentElement;   // .stage
+  const narrow = window.matchMedia('(max-width:959px)').matches;
+  const showImg = !!(dom.canvasHost && !dom.canvasHost.hidden);
+  const vh = appViewportHeight();
+
+  // 宽屏不缺地方；欢迎页没有图片；矮视口（横屏手机）交给 CSS 退回整页滚动
+  if(!narrow || !showImg || !stage || vh < SHORT_VH){
+    if(lastPvH !== 0){ root.style.removeProperty('--pv-h'); lastPvH = 0; return true; }
+    return false;
+  }
+
+  const topbarH = parseFloat(getComputedStyle(root).getPropertyValue('--topbar-h')) || 0;
+  const stCs = getComputedStyle(stage);
+  const gap = parseFloat(stCs.rowGap || stCs.gap) || 0;
+
+  let fixed = (parseFloat(stCs.paddingTop) || 0) + (parseFloat(stCs.paddingBottom) || 0);
+  let shown = 0;
+  for(const el of stage.children){
+    if(el === dom.canvasHost) continue;        // 图片自身高度正是要算的东西，跳过
+    if(el.hidden) continue;
+    const cs = getComputedStyle(el);
+    if(cs.display === 'none' || cs.position === 'absolute' || cs.position === 'fixed') continue;
+    fixed += el.getBoundingClientRect().height;
+    shown++;
+  }
+  const gaps = gap * shown;                    // 可见子项 = 固定项 + 图片，间隙数即 shown
+
+  const layout = stage.closest('.layout');
+  let outside = 0;
+  if(layout){
+    const lcs = getComputedStyle(layout);
+    outside += (parseFloat(lcs.paddingTop) || 0) + (parseFloat(lcs.paddingBottom) || 0);
+    const panel = layout.querySelector('.panel');
+    if(panel) outside += parseFloat(getComputedStyle(panel).marginTop) || 0;
+  }
+
+  const ratio = (state.ui && state.ui.pvBig) ? PV_BUDGET_RATIO.big : PV_BUDGET_RATIO.normal;
+  const budget = Math.max(PV_MIN_BUDGET, vh * ratio);
+  const free = vh - topbarH - fixed - gaps - outside;
+
+  let pv = Math.min(free - budget, vh * PV_MAX_RATIO);
+  pv = Math.max(pv, Math.min(PV_FLOOR_MIN, vh * PV_FLOOR_RATIO));   // 别小到看不清
+  pv = Math.round(pv);
+
+  if(pv !== lastPvH){
+    root.style.setProperty('--pv-h', pv + 'px');
+    lastPvH = pv;
+    return true;
+  }
+  return false;
+}
+
+/* 预览区大小开关：手机上把图片放大一点，代价是面板可视高度变小 */
+function syncPvSizeBtn(){
+  const b = dom.pvSize;
+  if(!b) return;
+  const big = !!(state.ui && state.ui.pvBig);
+  b.setAttribute('aria-pressed', big ? 'true' : 'false');
+  b.title = big ? '切换预览区大小（当前：大图，面板可视高度变小）' : '切换预览区大小（当前：标准）';
+  const svg = b.querySelector('svg');
+  if(svg){
+    svg.innerHTML = big
+      ? '<path d="M9 3v6H3"/><path d="M15 21v-6h6"/><path d="M3 9l6-6"/><path d="M21 15l-6 6"/>'
+      : '<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>';
+  }
+}
+function togglePvSize(){
+  state.ui.pvBig = !state.ui.pvBig;
+  syncPvSizeBtn();
+  saveSettings();
+  syncStagePreview();
+  renderPreview();          // 尺寸变了，重画一次保持清晰
+}
+
+/* ============================================================
    7. 初始化
    ============================================================ */
 function init(){
@@ -3478,6 +3674,7 @@ function init(){
   /* --- 预览工具条 --- */
   $('#btnPrev').addEventListener('click', () => setActive(Math.max(0, state.active-1)));
   $('#btnNext').addEventListener('click', () => setActive(Math.min(state.items.length-1, state.active+1)));
+  if(dom.pvSize) dom.pvSize.addEventListener('click', togglePvSize);
   $('#btnExportOne').addEventListener('click', exportActive);
   $('#btnExportAll').addEventListener('click', exportAll);
   $('#btnExportAll2').addEventListener('click', exportAll);
@@ -3486,7 +3683,8 @@ function init(){
     state.items = []; state.active = -1;
     dom.canvasHost.hidden = true; dom.stageTools.hidden = true;
     dom.dropzoneHost.hidden = false; dom.exifBox.hidden = true;
-    renderThumbs(); refreshFieldAvailability(); updateExportEstimate();
+    renderThumbs(); syncStagePreview();      // 回到欢迎页：清掉图片高度预算
+    refreshFieldAvailability(); updateExportEstimate();
     dom.detectNote.textContent = '还没有载入照片。载入后这里会列出识别到的厂商 / 镜头 / 参数。';
     dom.fileInput.value = '';
   });
@@ -3771,12 +3969,38 @@ function init(){
   let rz = null;
   window.addEventListener('resize', () => {
     syncTopbarHeight();               // 顶栏可能因换行变了高度，sticky 偏移要跟着走
+    syncStagePreview();               // 窄屏图片高度预算按新视口重算
     clearTimeout(rz);
     rz = setTimeout(() => { if(current()) renderPreview(); }, 180);
   });
-  window.addEventListener('orientationchange', syncTopbarHeight);
+  window.addEventListener('orientationchange', () => {
+    // 旋转时视口尺寸要等一拍才稳定，量两次更稳
+    syncTopbarHeight(); syncStagePreview();
+    setTimeout(() => { syncTopbarHeight(); if(syncStagePreview() && current()) renderPreview(); }, 260);
+  });
+  /* 手机地址栏收放 / 软键盘弹出：visualViewport 是最早能拿到新高度的来源 */
+  if(window.visualViewport){
+    let vvT = null;
+    const onVV = () => {
+      clearTimeout(vvT);
+      vvT = setTimeout(() => {
+        syncTopbarHeight();
+        if(syncStagePreview() && current()) renderPreview();
+      }, 220);
+    };
+    window.visualViewport.addEventListener('resize', onVV);
+    window.visualViewport.addEventListener('scroll', onVV);
+  }
 
   syncTopbarHeight();
+  /* 窄屏：把「自动识别到的信息」默认收起 —— 同一份信息在预览下方的
+     参数行里也有，展开一次就能看全，但默认让屏幕给可操作的控件 */
+  if(window.matchMedia('(max-width:959px)').matches){
+    const dbox = document.getElementById('detectBox');
+    if(dbox) dbox.removeAttribute('open');
+  }
+  syncPvSizeBtn();
+  syncStagePreview();
   updateExportEstimate();
 }
 
