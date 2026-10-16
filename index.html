@@ -162,11 +162,13 @@ html[data-theme="light"] .canvas-wrap{
 #preview{display:block;max-width:100%;height:auto;max-height:64vh}
 @media (min-width:960px){ #preview{max-height:74vh} }
 
-/* 预览区大小切换（只在手机 / 窄屏出现，宽屏本来就不缺地方） */
+/* 全屏放大查看入口。手机屏幕上横构图照片宽度早已顶到屏幕边，
+   把高度上限放开也只能大百分之几 —— 想看清水印细节只能放大，
+   所以这里给的是一个能双指缩放、拖动浏览的全屏层。 */
 .pv-size{
-  display:none; position:absolute; top:var(--sp-2); right:var(--sp-2); z-index:2;
+  position:absolute; top:var(--sp-2); right:var(--sp-2); z-index:3;
   width:44px; height:44px; border-radius:var(--r-full);
-  align-items:center; justify-content:center; padding:0;
+  display:inline-flex; align-items:center; justify-content:center; padding:0;
   border:1px solid rgba(255,255,255,.3); background:rgba(10,14,20,.52); color:#fff;
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
   cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
@@ -175,7 +177,52 @@ html[data-theme="light"] .canvas-wrap{
 .pv-size svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .pv-size:hover{background:rgba(10,14,20,.72)}
 .pv-size:active{transform:scale(.93)}
-.pv-size[aria-pressed="true"]{background:var(--amber-400); border-color:var(--amber-300); color:#2a1a00}
+
+/* ---------- 全屏放大查看层 ---------- */
+.viewer{
+  position:fixed; inset:0; z-index:300; background:#05080c;
+  touch-action:none; overscroll-behavior:contain;
+  -webkit-user-select:none; user-select:none;
+}
+.viewer[hidden]{display:none !important}
+.viewer-stage{position:absolute; inset:0; overflow:hidden}
+.viewer-stage canvas{
+  position:absolute; left:0; top:0; display:block;
+  max-width:none; max-height:none; transform-origin:0 0; will-change:transform;
+}
+.viewer-bar{
+  position:absolute; left:0; right:0; top:calc(var(--sp-3) + env(safe-area-inset-top, 0px));
+  display:flex; justify-content:space-between; align-items:flex-start; gap:var(--sp-2);
+  padding:0 var(--sp-3); pointer-events:none; z-index:2;
+}
+.viewer-bar > *{pointer-events:auto}
+.viewer-zoom{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:62px; min-height:44px; padding:9px 14px;
+  border-radius:var(--r-full); border:1px solid rgba(255,255,255,.18);
+  background:rgba(12,17,24,.76); color:#e9eef5; cursor:pointer;
+  font-size:12.5px; font-weight:600; font-variant-numeric:tabular-nums;
+  -webkit-tap-highlight-color:transparent;
+}
+.viewer-zoom:active{transform:scale(.95)}
+.viewer-btn{
+  width:44px; height:44px; padding:0; border-radius:var(--r-full);
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid rgba(255,255,255,.18); background:rgba(12,17,24,.76); color:#fff;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+}
+.viewer-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.viewer-btn:active{transform:scale(.95)}
+/* 提示放在顶部而不是底部 —— 水印默认就在画面下方，
+   提示压在下面会正好挡住用户想看的那几个字。 */
+.viewer-hint{
+  position:absolute; left:0; right:0;
+  top:calc(var(--sp-3) + env(safe-area-inset-top, 0px) + 50px);
+  text-align:center; font-size:12px; line-height:1.6;
+  color:rgba(233,238,245,.62); pointer-events:none;
+  transition:opacity .45s var(--ease); z-index:2;
+}
+.viewer-hint.off{opacity:0}
 
 /* ---------- 缩略图条 ---------- */
 .thumbs{
@@ -577,7 +624,7 @@ details.exif[open] summary::before{transform:rotate(90deg)}
     transition:max-height var(--t-fast) var(--ease);
   }
   .canvas-wrap{min-height:0}               /* 原来固定 200px 会把预算撑破 */
-  .pv-size{display:flex}
+  .layout{padding-left:10px; padding-right:10px}   /* 左右留白收紧，图片能多宽一点是一点 */
 
   /* 缩略图 76 → 52：省 24px，仍然好点 */
   .thumbs{padding:0 2px var(--sp-1); gap:var(--sp-1)}
@@ -664,9 +711,9 @@ details.exif[open] summary::before{transform:rotate(90deg)}
     <div id="canvasHost" hidden>
       <div class="canvas-wrap">
         <canvas id="preview" role="img" aria-label="带水印的照片预览"></canvas>
-        <button class="pv-size" id="btnPvSize" type="button" aria-pressed="false"
-                title="切换预览区大小" aria-label="切换预览区大小">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+        <button class="pv-size" id="btnPvSize" type="button"
+                title="全屏放大查看（可双指缩放）" aria-label="全屏放大查看">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H3v6"/><path d="M15 3h6v6"/><path d="M15 21h6v-6"/><path d="M9 21H3v-6"/></svg>
         </button>
       </div>
     </div>
@@ -985,6 +1032,21 @@ details.exif[open] summary::before{transform:rotate(90deg)}
 
 <div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="false"></div>
 
+<!-- ================= 全屏放大查看 ================= -->
+<div class="viewer" id="viewer" hidden>
+  <div class="viewer-stage" id="viewerStage">
+    <canvas id="viewerCanvas" role="img" aria-label="放大查看的水印预览"></canvas>
+  </div>
+  <div class="viewer-bar">
+    <button class="viewer-zoom" id="viewerZoom" type="button"
+            title="点一下回到适合屏幕的大小">适屏</button>
+    <button class="viewer-btn" id="viewerClose" type="button" aria-label="关闭放大查看">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="viewer-hint" id="viewerHint">双指捏合放大看细节 · 拖动浏览 · 双击看全图</div>
+</div>
+
 <script>
 "use strict";
 /* ============================================================
@@ -1117,7 +1179,7 @@ const state = {
   previewScale: 1,
   busy: false,
   multiMode: 'global',  // 'global' 全部照片共用一套版式 | 'per' 每张单独调整
-  ui: { pvBig:false }   // 手机上预览区是否放大（留给设置面板的地方相应变少）
+  ui: { pvBig:false }   // 旧版「预览区大小」开关的存档字段，保留只为读取老配置不报错
 };
 DEFAULT_FIELDS.forEach(k => state.fields[k] = true);
 
@@ -1141,6 +1203,8 @@ const $ = s => document.querySelector(s);
 const dom = {
   fileInput: $('#fileInput'), dropzone:$('#dropzone'), dropzoneHost:$('#dropzoneHost'),
   canvasHost:$('#canvasHost'), canvas:$('#preview'), pvSize:$('#btnPvSize'),
+  viewer:$('#viewer'), viewerStage:$('#viewerStage'), viewerCanvas:$('#viewerCanvas'),
+  viewerZoom:$('#viewerZoom'), viewerClose:$('#viewerClose'), viewerHint:$('#viewerHint'),
   thumbs:$('#thumbs'), stageTools:$('#stageTools'), stageMeta:$('#stageMeta'),
   exifBox:$('#exifBox'), exifBody:$('#exifBody'), detectNote:$('#detectNote'),
   fieldGroups:$('#fieldGroups'), tplGrid:$('#tplGrid'), anchorGrid:$('#anchorGrid'),
@@ -2382,24 +2446,31 @@ async function loadOne(file){
 
 function current(){ return state.items[state.active] || null; }
 
-function renderPreview(){
-  const it = current();
-  if(!it) return;
+/* 把一个 item 画进任意画布 —— 预览与全屏放大查看共用同一套绘制。
+   maxEdge 决定渲染精度：预览用 PREVIEW_MAX（够看就行，省性能），
+   全屏查看用 VIEWER_MAX（放大后文字边缘还要立得住）。 */
+function paintInto(cv, c2, it, maxEdge){
   const st = ST();
-  const tscale = Math.min(1, PREVIEW_MAX / Math.max(it.width, it.height));
+  const tscale = Math.min(1, maxEdge / Math.max(it.width, it.height));
   const pw = Math.max(1, Math.round(it.width * tscale));
   const ph = Math.max(1, Math.round(it.height * tscale));
   const L = layoutFor(pw, ph, st);
-  const w = L.cw, h = L.ch;
-  if(dom.canvas.width !== w || dom.canvas.height !== h){
-    dom.canvas.width = w;
-    dom.canvas.height = h;
+  if(cv.width !== L.cw || cv.height !== L.ch){
+    cv.width = L.cw;
+    cv.height = L.ch;
   }
-  state.previewScale = tscale;
-  dom.canvas.style.aspectRatio = w + ' / ' + h;
-
   // 预览始终按「浏览器显示结果」来画：宽色域导出只是数值不同，肉眼看与预览一致。
-  drawComposition(ctx, it.img, L, it.meta, { style: st, fields: state.fields, logo: logoImage(st.logo) });
+  drawComposition(c2, it.img, L, it.meta, { style: st, fields: state.fields, logo: logoImage(st.logo) });
+  return { L, tscale, st };
+}
+
+function renderPreview(){
+  const it = current();
+  if(!it) return;
+  const r = paintInto(dom.canvas, ctx, it, PREVIEW_MAX);
+  const st = r.st;
+  state.previewScale = r.tscale;
+  dom.canvas.style.aspectRatio = r.L.cw + ' / ' + r.L.ch;
 
   // 状态栏
   const mm = it.meta;
@@ -2418,6 +2489,12 @@ function renderPreview(){
   if(pe) bits.push(esc(pe));
   if(it.iccDesc && it.wide) bits.push('<span style="color:var(--accent)">' + esc(it.iccDesc) + '</span>');
   dom.stageMeta.innerHTML = bits.join(' &nbsp;·&nbsp; ');
+
+  /* canvas 尺寸（也就是图片按宽度显示时需要的像素高）可能刚变，
+     重算一次高度预算。用签名挡住重复计算：拖滑块时尺寸没变，
+     不必每次都去量一遍布局。 */
+  const sig = dom.canvas.width + '×' + dom.canvas.height + '@' + appViewportHeight();
+  if(sig !== lastPvSig){ lastPvSig = sig; syncStagePreview(); }
 }
 
 /* 高频交互（拖滑块 / 取色器）用 rAF 节流，避免每个事件都重绘整张大画布 */
@@ -3048,6 +3125,7 @@ function setActive(idx, silent){
   dom.thumbs.querySelectorAll('.thumb').forEach((el,i) => el.setAttribute('aria-current', String(i === idx)));
   const cur = dom.thumbs.children[idx];
   if(cur) cur.scrollIntoView({ block:'nearest', inline:'nearest' });
+  if(viewer.open) syncViewer();
   if(!silent) { /* 无额外动作 */ }
 }
 
@@ -3505,17 +3583,22 @@ function syncTopbarHeight(){
    里，这些固定开销实测能占掉视口 60% 以上；图片再固定拿走 34dvh，
    设置面板就只剩一百来像素（约一行勾选项），没法用。
 
-   做法：不写死百分比，而是实测后算——
-     --pv-h = 视口高 − 顶栏 − 粘性块实测固定开销 − 给面板预留的份额
-   预留份额按视口比例给（normal 42% / 大图模式 20%），并设上下限，
-   于是不同机型、分辨率、横竖屏都能各自得到合适的比例。
+   做法：不写死百分比，而是实测后算。
+     cap    = 图片高度上限：不超过视口 72%，且必须给面板留够份额
+     needH  = 「宽度已经决定的高度」—— canvas 按容器宽度等比缩放后
+              自然需要的高度。图片在手机上通常是宽度先到顶，此时
+              高度上限再大也没用，所以直接把 needH 作为目标值。
+     --pv-h = clamp(needH, 保底, cap)
+
+   于是横构图照片能刚好占满可用宽度（不被高度上限白白掐小），
+   竖构图 / 大留白模板则由 cap 兜住，不同机型分辨率各自合适。
    没有图片（欢迎页）或宽屏时不参与，直接清掉变量走原样式。
    ============================================================ */
-const PV_BUDGET_RATIO = { normal:0.42, big:0.20 };  // 设置面板至少占视口的比例
-const PV_MAX_RATIO    = 0.46;    // 图片最多占视口
-const PV_FLOOR_RATIO  = 0.17;    // 图片保底占视口
-const PV_FLOOR_MIN    = 120;     // 且不低于这个像素高
-const PV_MIN_BUDGET   = 190;     // 给面板至少留这么多像素
+const PV_MAX_RATIO    = 0.72;    // 图片最多占视口
+const PV_FLOOR_RATIO  = 0.20;    // 图片保底占视口
+const PV_FLOOR_MIN    = 150;     // 且不低于这个像素高
+const PANEL_MIN_RATIO = 0.26;    // 设置面板至少占视口的比例
+const PANEL_MIN_PX    = 190;     // 且不低于这么多像素
 const SHORT_VH        = 480;     // 矮于这个高度（横屏手机）不做粘性预算，走 CSS 的整页滚动
 
 /* 真实可视高度：Edge/Chrome 地址栏收放、软键盘弹出都会改变它 */
@@ -3526,6 +3609,7 @@ function appViewportHeight(){
 }
 
 let lastPvH = 0;
+let lastPvSig = '';      // canvas 尺寸 + 视口的签名，挡掉重复的预算计算
 /* 返回值：这次有没有改动 --pv-h（调用方据此决定要不要重画预览） */
 function syncStagePreview(){
   const root = document.documentElement;
@@ -3565,13 +3649,22 @@ function syncStagePreview(){
     if(panel) outside += parseFloat(getComputedStyle(panel).marginTop) || 0;
   }
 
-  const ratio = (state.ui && state.ui.pvBig) ? PV_BUDGET_RATIO.big : PV_BUDGET_RATIO.normal;
-  const budget = Math.max(PV_MIN_BUDGET, vh * ratio);
-  const free = vh - topbarH - fixed - gaps - outside;
+  /* 「宽度已经决定的高度」：图片按容器宽度等比缩放后本来就需要的像素高。
+     横构图照片在手机上宽度先顶到屏幕两边，这时高度上限给得再大也白给
+     （实测 367→398 px，只有 8%），所以直接以它为目标值。 */
+  let needH = 0;
+  const wrap = dom.canvasHost && dom.canvasHost.firstElementChild;   // .canvas-wrap
+  if(wrap && dom.canvas.width && dom.canvas.height){
+    const avail = wrap.clientWidth;
+    if(avail > 0) needH = Math.round(avail * (dom.canvas.height / dom.canvas.width));
+  }
 
-  let pv = Math.min(free - budget, vh * PV_MAX_RATIO);
-  pv = Math.max(pv, Math.min(PV_FLOOR_MIN, vh * PV_FLOOR_RATIO));   // 别小到看不清
-  pv = Math.round(pv);
+  const free = vh - topbarH - fixed - gaps - outside;
+  const floor = Math.min(PV_FLOOR_MIN, vh * PV_FLOOR_RATIO);
+  const panelMin = Math.max(PANEL_MIN_PX, vh * PANEL_MIN_RATIO);
+  // 上限：不超视口 72%，并且必须给面板留下它的份额；空间实在不够时退回保底
+  const cap = Math.max(floor, Math.min(vh * PV_MAX_RATIO, free - panelMin));
+  const pv = Math.round(Math.min(Math.max(needH || 0, floor), cap));
 
   if(pv !== lastPvH){
     root.style.setProperty('--pv-h', pv + 'px');
@@ -3581,26 +3674,197 @@ function syncStagePreview(){
   return false;
 }
 
-/* 预览区大小开关：手机上把图片放大一点，代价是面板可视高度变小 */
-function syncPvSizeBtn(){
-  const b = dom.pvSize;
-  if(!b) return;
-  const big = !!(state.ui && state.ui.pvBig);
-  b.setAttribute('aria-pressed', big ? 'true' : 'false');
-  b.title = big ? '切换预览区大小（当前：大图，面板可视高度变小）' : '切换预览区大小（当前：标准）';
-  const svg = b.querySelector('svg');
-  if(svg){
-    svg.innerHTML = big
-      ? '<path d="M9 3v6H3"/><path d="M15 21v-6h6"/><path d="M3 9l6-6"/><path d="M21 15l-6 6"/>'
-      : '<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>';
-  }
+/* ============================================================
+   全屏放大查看
+   ------------------------------------------------------------
+   手机屏幕上照片宽度早就顶到屏幕两边了，靠调高度上限根本大不了
+   多少。要看清画面里的水印文字，只有一条路：给一个能真正放大的层。
+   独立画布 + 2560 长边重绘（预览只用 1600），所以放大两三倍仍然清晰。
+   手势：双指捏合缩放、单指拖动、双击复位、点倍率标签回适屏。
+   ============================================================ */
+const VIEWER_MAX = 2560;
+const viewer = { s:0, s0:0, sMax:1, tx:0, ty:0, cw:0, ch:0, open:false };
+const vctx = dom.viewerCanvas.getContext('2d');
+const vPts = new Map();              // pointerId → {x,y}（多指同时按下时用）
+let vPinch = null;                   // 双指起始状态
+let vDown = null;                    // 当前按下的那一指（用来识别双击）
+let lastTap = { t:0, x:0, y:0 };
+let bodyOverflowPrev = '';
+
+function vClampPan(){
+  const sw = dom.viewerStage.clientWidth, sh = dom.viewerStage.clientHeight;
+  const dw = viewer.cw * viewer.s, dh = viewer.ch * viewer.s;
+  viewer.tx = (dw <= sw) ? (sw - dw) / 2 : Math.min(0, Math.max(sw - dw, viewer.tx));
+  viewer.ty = (dh <= sh) ? (sh - dh) / 2 : Math.min(0, Math.max(sh - dh, viewer.ty));
 }
-function togglePvSize(){
-  state.ui.pvBig = !state.ui.pvBig;
-  syncPvSizeBtn();
-  saveSettings();
-  syncStagePreview();
-  renderPreview();          // 尺寸变了，重画一次保持清晰
+function vApply(){
+  dom.viewerCanvas.style.transform =
+    'translate(' + viewer.tx + 'px,' + viewer.ty + 'px) scale(' + viewer.s + ')';
+}
+function vZoomLabel(){
+  if(!dom.viewerZoom) return;
+  const z = viewer.s0 ? viewer.s / viewer.s0 : 1;
+  dom.viewerZoom.textContent = z < 1.06 ? '适屏' : z.toFixed(1) + '×';
+}
+/* 摆放大图。
+   mode='ink' → 打开 / 切图时的默认：直接放大到「画布 1 像素 ≈ 屏幕 1 个物理像素」，
+                并把视野对准水印所在的角落（锚点 bottom → 贴底，right → 贴右）。
+                用户点开这个按钮就是想看水印细节，不该让他先捏合再满屏找。
+   mode='fit' → 看全图（双击 / 点倍率标签）：整张缩进屏幕，居中。 */
+function vLayout(mode){
+  const stage = dom.viewerStage, cv = dom.viewerCanvas;
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  if(!sw || !sh || !cv.width) return;
+  viewer.cw = cv.width; viewer.ch = cv.height;
+  viewer.s0 = Math.min(sw / cv.width, sh / cv.height);
+  // 放大上限：画布 1 像素约占屏幕 2 个物理像素，再放大只剩马赛克
+  viewer.sMax = Math.max(2 / (window.devicePixelRatio || 1), viewer.s0 * 2);
+
+  if(mode === 'ink'){
+    const dpr = window.devicePixelRatio || 1;
+    viewer.s = Math.min(viewer.sMax, Math.max(viewer.s0, Math.min(1 / dpr, viewer.s0 * 3)));
+  }else{
+    viewer.s = viewer.s0;
+  }
+
+  const dw = cv.width * viewer.s, dh = cv.height * viewer.s;
+  /* 视野对准水印：
+       纵向 = anchor 的纵向分量（bottom / top / middle）
+       横向 = anchor 的横向分量；但通栏模板（bled）整幅占满宽度、横向居中没意义，
+              这时改看模板的文字对齐 align —— 否则居左的水印会被裁在屏幕外。 */
+  const st = ST() || {};
+  const tpl = TEMPLATES[st.template] || TEMPLATES.bar;
+  const anc = ANCHORS[st.anchor] || ANCHORS['bottom'];
+  const aV = String(anc[0]);
+  let aH = String(anc[1]);
+  if(aH === 'center' && tpl.bled) aH = String(tpl.align || 'center');
+
+  if(dw <= sw) viewer.tx = (sw - dw) / 2;
+  else if(mode === 'ink') viewer.tx = (aH === 'right') ? sw - dw : (aH === 'center' ? (sw - dw) / 2 : 0);
+  else viewer.tx = (sw - dw) / 2;
+
+  if(dh <= sh) viewer.ty = (sh - dh) / 2;
+  else if(mode === 'ink') viewer.ty = (aV === 'top') ? 0 : (aV === 'bottom' ? sh - dh : (sh - dh) / 2);
+  else viewer.ty = (sh - dh) / 2;
+
+  vClampPan();
+  vApply(); vZoomLabel();
+}
+function openViewer(){
+  const it = current();
+  if(!it || viewer.open) return;
+  try{
+    paintInto(dom.viewerCanvas, vctx, it, VIEWER_MAX);
+  }catch(e){
+    console.warn('放大查看渲染失败', e);
+    toast('这张图太大了，放大查看没能打开', 'err');
+    return;
+  }
+  bodyOverflowPrev = document.body.style.overflow;
+  dom.viewer.hidden = false;
+  viewer.open = true;
+  document.body.style.overflow = 'hidden';        // 别让底下的页面跟着滚
+  dom.viewerHint.classList.remove('off');
+  clearTimeout(openViewer._t);
+  openViewer._t = setTimeout(() => dom.viewerHint.classList.add('off'), 3000);
+  requestAnimationFrame(() => vLayout('ink'));    // 等布局出来才量得到尺寸
+}
+function closeViewer(){
+  if(!viewer.open) return;
+  viewer.open = false;
+  vPts.clear(); vPinch = null; vDown = null;
+  dom.viewer.hidden = true;
+  dom.viewerCanvas.style.transform = '';
+  document.body.style.overflow = bodyOverflowPrev || '';
+}
+/* 放大层开着时切了图（键盘 ← →），把放大层也换成新的那张 */
+function syncViewer(){
+  if(!viewer.open) return;
+  const it = current();
+  if(!it){ closeViewer(); return; }
+  try{
+    paintInto(dom.viewerCanvas, vctx, it, VIEWER_MAX);
+  }catch(e){
+    closeViewer(); return;
+  }
+  vLayout('ink');
+}
+function bindViewerGestures(){
+  const stage = dom.viewerStage;
+  if(!stage) return;
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  const mid  = (a, b) => ({ x:(a.x + b.x) / 2, y:(a.y + b.y) / 2 });
+
+  stage.addEventListener('pointerdown', e => {
+    if(stage.setPointerCapture) stage.setPointerCapture(e.pointerId);
+    if(dom.viewerHint) dom.viewerHint.classList.add('off');   // 一有操作就让开
+    vPts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if(vPts.size === 1) vDown = { x:e.clientX, y:e.clientY, moved:false };
+    if(vPts.size === 2){
+      const [a, b] = [...vPts.values()];
+      vPinch = { d: dist(a, b) || 1, s: viewer.s };
+    }
+  });
+
+  stage.addEventListener('pointermove', e => {
+    const p = vPts.get(e.pointerId);
+    if(!p) return;
+    const cur = { x:e.clientX, y:e.clientY };
+    if(vDown && Math.hypot(cur.x - vDown.x, cur.y - vDown.y) > 8) vDown.moved = true;
+
+    if(vPts.size === 1 && !vPinch){
+      viewer.tx += cur.x - p.x;
+      viewer.ty += cur.y - p.y;
+      vPts.set(e.pointerId, cur);
+      vClampPan(); vApply();
+      return;
+    }
+    vPts.set(e.pointerId, cur);
+    if(vPts.size === 2 && vPinch){
+      const [a, b] = [...vPts.values()];
+      const next = Math.min(viewer.sMax, Math.max(viewer.s0, vPinch.s * (dist(a, b) / vPinch.d)));
+      const m = mid(a, b), f = next / viewer.s;
+      viewer.tx = m.x - (m.x - viewer.tx) * f;      // 以两指中点为锚点缩放
+      viewer.ty = m.y - (m.y - viewer.ty) * f;
+      viewer.s = next;
+      vClampPan(); vApply(); vZoomLabel();
+    }
+  }, { passive:true });
+
+  const end = e => {
+    vPts.delete(e.pointerId);
+    if(vPts.size < 2) vPinch = null;
+    if(vPts.size === 0 && e.type === 'pointerup' && vDown && !vDown.moved){
+      const now = Date.now();
+      if(now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 28){
+        vLayout('fit');                             // 双击 → 看全图
+        lastTap = { t:0, x:0, y:0 };
+      }else{
+        lastTap = { t:now, x:e.clientX, y:e.clientY };
+      }
+    }
+    if(vPts.size === 0) vDown = null;
+  };
+  stage.addEventListener('pointerup', end);
+  stage.addEventListener('pointercancel', end);
+  // 鼠标滚轮 / 触控板缩放（桌面顺带支持）
+  stage.addEventListener('wheel', e => {
+    e.preventDefault();
+    const next = Math.min(viewer.sMax, Math.max(viewer.s0, viewer.s * (e.deltaY < 0 ? 1.12 : 1 / 1.12)));
+    const f = next / viewer.s;
+    viewer.tx = e.clientX - (e.clientX - viewer.tx) * f;
+    viewer.ty = e.clientY - (e.clientY - viewer.ty) * f;
+    viewer.s = next;
+    vClampPan(); vApply(); vZoomLabel();
+  }, { passive:false });
+
+  dom.viewerZoom  && dom.viewerZoom.addEventListener('click', () => vLayout('fit'));
+  dom.viewerClose && dom.viewerClose.addEventListener('click', closeViewer);
+  if(dom.pvSize) dom.pvSize.addEventListener('click', openViewer);
+  if(dom.canvas) dom.canvas.addEventListener('click', openViewer);   // 点图片也能放大
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && viewer.open){ closeViewer(); e.stopPropagation(); }
+  });
 }
 
 /* ============================================================
@@ -3674,13 +3938,13 @@ function init(){
   /* --- 预览工具条 --- */
   $('#btnPrev').addEventListener('click', () => setActive(Math.max(0, state.active-1)));
   $('#btnNext').addEventListener('click', () => setActive(Math.min(state.items.length-1, state.active+1)));
-  if(dom.pvSize) dom.pvSize.addEventListener('click', togglePvSize);
   $('#btnExportOne').addEventListener('click', exportActive);
   $('#btnExportAll').addEventListener('click', exportAll);
   $('#btnExportAll2').addEventListener('click', exportAll);
   $('#btnClear').addEventListener('click', () => {
     state.items.forEach(it => { try{ URL.revokeObjectURL(it.url); }catch(e){} });
     state.items = []; state.active = -1;
+    closeViewer();                                  // 照片清空了，放大层必须跟着关
     dom.canvasHost.hidden = true; dom.stageTools.hidden = true;
     dom.dropzoneHost.hidden = false; dom.exifBox.hidden = true;
     renderThumbs(); syncStagePreview();      // 回到欢迎页：清掉图片高度预算
@@ -3999,7 +4263,7 @@ function init(){
     const dbox = document.getElementById('detectBox');
     if(dbox) dbox.removeAttribute('open');
   }
-  syncPvSizeBtn();
+  bindViewerGestures();
   syncStagePreview();
   updateExportEstimate();
 }
